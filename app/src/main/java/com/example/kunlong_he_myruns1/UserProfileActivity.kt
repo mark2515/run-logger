@@ -13,7 +13,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -34,7 +33,6 @@ class UserProfileActivity : AppCompatActivity() {
         private const val KEY_GENDER = "gender"
         private const val KEY_CLASS = "class"
         private const val KEY_MAJOR = "major"
-        private const val TEXTVIEW_KEY = "textview_key"
     }
     
     private lateinit var editTextName: EditText
@@ -48,7 +46,6 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var buttonSave: Button
     private lateinit var buttonCancel: Button
     private lateinit var imageView: ImageView
-    private lateinit var textView: TextView
     private lateinit var btnChangePhoto: Button
     
     private lateinit var sharedPreferences: SharedPreferences
@@ -57,7 +54,6 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     
     private val tempImgFileName = "xd_temp_img.jpg"
-    private var line: String? = "..."
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,11 +65,6 @@ class UserProfileActivity : AppCompatActivity() {
         loadUserProfile()
         setupClickListeners()
         setupCamera()
-        
-        if (savedInstanceState != null) {
-            line = savedInstanceState.getString(TEXTVIEW_KEY)
-        }
-        textView.text = line
     }
     
     private fun initializeViews() {
@@ -88,7 +79,6 @@ class UserProfileActivity : AppCompatActivity() {
         buttonSave = findViewById(R.id.buttonSave)
         buttonCancel = findViewById(R.id.buttonCancel)
         imageView = findViewById(R.id.imageProfile)
-        textView = findViewById(R.id.text_view)
         btnChangePhoto = findViewById(R.id.btnChangePhoto)
     }
     
@@ -102,9 +92,6 @@ class UserProfileActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val bitmap = Util.getBitmap(this, tempImgUri)
                 myViewModel.userImage.value = bitmap
-
-                line = tempImgUri.path.toString()
-                textView.text = line
             }
         }
 
@@ -184,11 +171,6 @@ class UserProfileActivity : AppCompatActivity() {
                 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         finish()
-    }
-    
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(TEXTVIEW_KEY, line)
     }
     
     override fun onResume() {
