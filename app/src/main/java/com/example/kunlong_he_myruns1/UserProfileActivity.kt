@@ -1,15 +1,27 @@
 package com.example.kunlong_he_myruns1
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
+import java.io.File
 
 class UserProfileActivity : AppCompatActivity() {
     
@@ -22,6 +34,7 @@ class UserProfileActivity : AppCompatActivity() {
         private const val KEY_GENDER = "gender"
         private const val KEY_CLASS = "class"
         private const val KEY_MAJOR = "major"
+        private const val TEXTVIEW_KEY = "textview_key"
     }
     
     private lateinit var editTextName: EditText
@@ -34,8 +47,17 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var editTextMajor: EditText
     private lateinit var buttonSave: Button
     private lateinit var buttonCancel: Button
+    private lateinit var imageView: ImageView
+    private lateinit var textView: TextView
+    private lateinit var btnChangePhoto: Button
     
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var tempImgUri: Uri
+    private lateinit var myViewModel: MyViewModel
+    private lateinit var cameraResult: ActivityResultLauncher<Intent>
+    
+    private val tempImgFileName = "xd_temp_img.jpg"
+    private var line: String? = "..."
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +68,12 @@ class UserProfileActivity : AppCompatActivity() {
         initializeSharedPreferences()
         loadUserProfile()
         setupClickListeners()
+        setupCamera()
+        
+        if (savedInstanceState != null) {
+            line = savedInstanceState.getString(TEXTVIEW_KEY)
+        }
+        textView.text = line
     }
     
     private fun initializeViews() {
@@ -59,8 +87,38 @@ class UserProfileActivity : AppCompatActivity() {
         editTextMajor = findViewById(R.id.editTextMajor)
         buttonSave = findViewById(R.id.buttonSave)
         buttonCancel = findViewById(R.id.buttonCancel)
+        imageView = findViewById(R.id.imageProfile)
+        textView = findViewById(R.id.text_view)
+        btnChangePhoto = findViewById(R.id.btnChangePhoto)
     }
     
+    private fun setupCamera() {
+        Util.checkPermissions(this)
+
+        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+        tempImgUri = FileProvider.getUriForFile(this, "com.example.kunlong_he_myruns1.fileprovider", tempImgFile)
+
+        cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bitmap = Util.getBitmap(this, tempImgUri)
+                myViewModel.userImage.value = bitmap
+
+                line = tempImgUri.path.toString()
+                textView.text = line
+            }
+        }
+
+        myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
+        myViewModel.userImage.observe(this) { bitmap ->
+            imageView.setImageBitmap(bitmap)
+        }
+
+        if (tempImgFile.exists()) {
+            val bitmap = Util.getBitmap(this, tempImgUri)
+            imageView.setImageBitmap(bitmap)
+        }
+    }
+
     private fun initializeSharedPreferences() {
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
@@ -87,13 +145,17 @@ class UserProfileActivity : AppCompatActivity() {
     
     private fun setupClickListeners() {        
         buttonSave.setOnClickListener {
-            // Log.d(TAG, "Save button clicked")
             saveUserProfile()
         }
         
         buttonCancel.setOnClickListener {
-            // Log.d(TAG, "Cancel button clicked")
             finish()
+        }
+        
+        btnChangePhoto.setOnClickListener {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
+            cameraResult.launch(intent)
         }
     }
     
@@ -122,6 +184,11 @@ class UserProfileActivity : AppCompatActivity() {
                 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         finish()
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(TEXTVIEW_KEY, line)
     }
     
     override fun onResume() {
