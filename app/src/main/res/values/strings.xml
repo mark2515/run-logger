@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Kunlong_He_MyRuns1</string>
+    <string name="user_profile">User Profile</string>
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+    <string name="gender">Gender</string>
+    <string name="class_year">Class</string>
+    <string name="major">Major</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
+    <string name="save">SAVE</string>
+    <string name="cancel">CANCEL</string>
 </resources>
