@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import java.io.File
+import java.io.FileOutputStream
 
 class UserProfileActivity : AppCompatActivity() {
     
@@ -33,6 +35,7 @@ class UserProfileActivity : AppCompatActivity() {
         private const val KEY_GENDER = "gender"
         private const val KEY_CLASS = "class"
         private const val KEY_MAJOR = "major"
+        private const val KEY_HAS_AVATAR = "has_avatar"
     }
     
     private lateinit var editTextName: EditText
@@ -54,6 +57,9 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     
     private val tempImgFileName = "xd_temp_img.jpg"
+    private val savedImgFileName = "user_avatar.jpg"
+    
+    private var originalAvatar: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +98,7 @@ class UserProfileActivity : AppCompatActivity() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val bitmap = Util.getBitmap(this, tempImgUri)
                 myViewModel.userImage.value = bitmap
+                tempImgFile.delete()
             }
         }
 
@@ -100,9 +107,21 @@ class UserProfileActivity : AppCompatActivity() {
             imageView.setImageBitmap(bitmap)
         }
 
-        if (tempImgFile.exists()) {
-            val bitmap = Util.getBitmap(this, tempImgUri)
-            imageView.setImageBitmap(bitmap)
+        loadSavedAvatar()
+    }
+    
+    private fun loadSavedAvatar() {
+        val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
+        if (savedImgFile.exists() && sharedPreferences.getBoolean(KEY_HAS_AVATAR, false)) {
+            try {
+                val savedImgUri = Uri.fromFile(savedImgFile)
+                val bitmap = Util.getBitmap(this, savedImgUri)
+                originalAvatar = bitmap
+                myViewModel.userImage.value = bitmap
+                imageView.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading saved avatar", e)
+            }
         }
     }
 
@@ -136,6 +155,7 @@ class UserProfileActivity : AppCompatActivity() {
         }
         
         buttonCancel.setOnClickListener {
+            restoreOriginalAvatar()
             finish()
         }
         
@@ -159,6 +179,8 @@ class UserProfileActivity : AppCompatActivity() {
             R.id.radioButtonMale -> "Male"
             else -> ""
         }
+        
+        saveAvatarPermanently()
                 
         val editor = sharedPreferences.edit()
         editor.putString(KEY_NAME, name)
@@ -171,6 +193,39 @@ class UserProfileActivity : AppCompatActivity() {
                 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         finish()
+    }
+    
+    private fun saveAvatarPermanently() {
+        val currentAvatar = myViewModel.userImage.value
+        if (currentAvatar != null) {
+            try {
+                val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
+                val fileOutputStream = FileOutputStream(savedImgFile)
+                currentAvatar.compress(Bitmap.CompressFormat.JPEG, 90, fileOutputStream)
+                fileOutputStream.flush()
+                fileOutputStream.close()
+                
+                val editor = sharedPreferences.edit()
+                editor.putBoolean(KEY_HAS_AVATAR, true)
+                editor.apply()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error saving avatar", e)
+                Toast.makeText(this, "Error saving avatar", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    
+    private fun restoreOriginalAvatar() {
+        if (originalAvatar != null) {
+            myViewModel.userImage.value = originalAvatar
+        } else {
+            myViewModel.userImage.value = null
+        }
+    }
+    
+    override fun onBackPressed() {
+        restoreOriginalAvatar()
+        super.onBackPressed()
     }
     
     override fun onResume() {
@@ -186,5 +241,10 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
+        
+        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+        if (tempImgFile.exists()) {
+            tempImgFile.delete()
+        }
     }
 }
