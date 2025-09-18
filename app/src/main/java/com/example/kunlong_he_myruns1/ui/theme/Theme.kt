@@ -1,4 +1,4 @@
-package com.example.kunlong_he_myruns1.ui.theme
+package moe.kunlonghe.myruns.ui.theme
 
 import android.app.Activity
 import android.os.Build

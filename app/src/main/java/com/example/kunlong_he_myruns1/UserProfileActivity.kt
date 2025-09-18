@@ -1,4 +1,4 @@
-package com.example.kunlong_he_myruns1
+package moe.kunlonghe.myruns
 
 import android.app.Activity
 import android.content.Context
@@ -133,7 +133,7 @@ class UserProfileActivity : AppCompatActivity() {
 
         if (tempImgUri == null) {
             val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
-            tempImgUri = FileProvider.getUriForFile(this, "com.example.kunlong_he_myruns1.fileprovider", tempImgFile)
+            tempImgUri = FileProvider.getUriForFile(this, "moe.kunlonghe.myruns.fileprovider", tempImgFile)
         }
 
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->

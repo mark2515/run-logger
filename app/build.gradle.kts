@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.kunlong_he_myruns1"
+    namespace = "moe.kunlonghe.myruns"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.kunlong_he_myruns1"
+        applicationId = "moe.kunlonghe.myruns"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

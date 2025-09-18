@@ -1,4 +1,4 @@
-package com.example.kunlong_he_myruns1
+package moe.kunlonghe.myruns
 
 import android.graphics.Bitmap
 import androidx.lifecycle.MutableLiveData

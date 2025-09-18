@@ -1,4 +1,4 @@
-package com.example.kunlong_he_myruns1.ui.theme
+package moe.kunlonghe.myruns.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

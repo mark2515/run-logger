@@ -32,12 +32,11 @@
             android:name=".UserProfileActivity"
             android:exported="false"
             android:label="MyRuns1"
-            android:configChanges="orientation|screenSize|keyboardHidden"
             android:theme="@style/Theme.Kunlong_He_MyRuns1" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.kunlong_he_myruns1.fileprovider"
+            android:authorities="moe.kunlonghe.myruns.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
