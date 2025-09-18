@@ -11,6 +11,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
+import java.io.IOException
 
 object Util {
     fun requestAllPermissions(activity: Activity?) {
@@ -44,7 +46,29 @@ object Util {
     fun getBitmap(context: Context, imgUri: Uri): Bitmap {
         var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(imgUri))
         val matrix = Matrix()
-        var ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        
+        val rotation = getImageRotation(context, imgUri)
+        if (rotation != 0f) {
+            matrix.postRotate(rotation)
+        }
+        
+        val ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
         return ret
+    }
+    
+    private fun getImageRotation(context: Context, imgUri: Uri): Float {
+        return try {
+            context.contentResolver.openInputStream(imgUri)?.use { inputStream ->
+                val exif = ExifInterface(inputStream)
+                when (exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+                    ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+                    ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+                    else -> 0f
+                }
+            } ?: 0f
+        } catch (e: IOException) {
+            0f
+        }
     }
 }
