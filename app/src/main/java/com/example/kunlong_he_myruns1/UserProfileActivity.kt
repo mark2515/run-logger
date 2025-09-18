@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
@@ -64,6 +65,7 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate() called")
+        enableEdgeToEdge()
         setContentView(R.layout.activity_user_profile)
         
         initializeViews()
@@ -89,7 +91,7 @@ class UserProfileActivity : AppCompatActivity() {
     }
     
     private fun setupCamera() {
-        Util.checkPermissions(this)
+        Util.requestAllPermissions(this)
 
         val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
         tempImgUri = FileProvider.getUriForFile(this, "com.example.kunlong_he_myruns1.fileprovider", tempImgFile)

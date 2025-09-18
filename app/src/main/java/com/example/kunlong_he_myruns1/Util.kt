@@ -13,10 +13,31 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 object Util {
-    fun checkPermissions(activity: Activity?) {
+    fun requestAllPermissions(activity: Activity?) {
         if (Build.VERSION.SDK_INT < 23) return
-        if (ContextCompat.checkSelfPermission(activity!!, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, arrayOf(Manifest.permission.CAMERA), 0)
+        val a = activity ?: return
+
+        val needed = mutableListOf<String>()
+
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            needed.add(Manifest.permission.CAMERA)
+        }
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            if (ContextCompat.checkSelfPermission(a, Manifest.permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+                needed.add(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            if (ContextCompat.checkSelfPermission(a, Manifest.permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+                needed.add(Manifest.permission.READ_MEDIA_VIDEO)
+            }
+        } else {
+            if (ContextCompat.checkSelfPermission(a, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                needed.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        }
+
+        if (needed.isNotEmpty()) {
+            ActivityCompat.requestPermissions(a, needed.toTypedArray(), 100)
         }
     }
 
