@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -41,6 +42,7 @@ class UserProfileActivity : AppCompatActivity() {
         private const val KEY_CLASS = "class"
         private const val KEY_MAJOR = "major"
         private const val KEY_HAS_AVATAR = "has_avatar"
+        private const val BUNDLE_TEMP_IMG_URI = "temp_img_uri"
     }
     
     private lateinit var editTextName: EditText
@@ -57,7 +59,7 @@ class UserProfileActivity : AppCompatActivity() {
     private lateinit var btnChangePhoto: Button
     
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var tempImgUri: Uri
+    private var tempImgUri: Uri? = null
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
     
@@ -79,6 +81,24 @@ class UserProfileActivity : AppCompatActivity() {
         loadUserProfile()
         setupClickListeners()
         setupCamera()
+        
+        savedInstanceState?.let {
+            val uriString = it.getString(BUNDLE_TEMP_IMG_URI)
+            if (uriString != null) {
+                tempImgUri = Uri.parse(uriString)
+            }
+        }
+    }
+    
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        tempImgUri?.let {
+            outState.putString(BUNDLE_TEMP_IMG_URI, it.toString())
+        }
+    }
+    
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
     
     private fun setupWindowInsets() {
@@ -111,14 +131,27 @@ class UserProfileActivity : AppCompatActivity() {
     private fun setupCamera() {
         Util.requestAllPermissions(this)
 
-        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
-        tempImgUri = FileProvider.getUriForFile(this, "com.example.kunlong_he_myruns1.fileprovider", tempImgFile)
+        if (tempImgUri == null) {
+            val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+            tempImgUri = FileProvider.getUriForFile(this, "com.example.kunlong_he_myruns1.fileprovider", tempImgFile)
+        }
 
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val bitmap = Util.getBitmap(this, tempImgUri)
-                myViewModel.userImage.value = bitmap
-                tempImgFile.delete()
+                tempImgUri?.let { uri ->
+                    try {
+                        val bitmap = Util.getBitmap(this, uri)
+                        myViewModel.userImage.value = bitmap
+                        
+                        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+                        if (tempImgFile.exists()) {
+                            tempImgFile.delete()
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error processing camera result", e)
+                        Toast.makeText(this, "Error processing photo", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
@@ -182,9 +215,22 @@ class UserProfileActivity : AppCompatActivity() {
         }
         
         btnChangePhoto.setOnClickListener {
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri)
-            cameraResult.launch(intent)
+            tempImgUri?.let { uri ->
+                val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+                if (!tempImgFile.exists()) {
+                    try {
+                        tempImgFile.createNewFile()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error creating temp file", e)
+                        Toast.makeText(this, "Error preparing camera", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                }
+                
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                cameraResult.launch(intent)
+            }
         }
     }
     

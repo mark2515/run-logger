@@ -45,6 +45,12 @@ object Util {
 
     fun getBitmap(context: Context, imgUri: Uri): Bitmap {
         var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(imgUri))
+            ?: throw IllegalArgumentException("Unable to decode image from URI")
+        
+        if (bitmap.isRecycled) {
+            throw IllegalStateException("Bitmap is recycled")
+        }
+        
         val matrix = Matrix()
         
         val rotation = getImageRotation(context, imgUri)
@@ -52,8 +58,17 @@ object Util {
             matrix.postRotate(rotation)
         }
         
-        val ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-        return ret
+        return try {
+            val ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            // Recycle original bitmap if it's different from the returned one
+            if (ret != bitmap) {
+                bitmap.recycle()
+            }
+            ret
+        } catch (e: OutOfMemoryError) {
+            bitmap.recycle()
+            throw e
+        }
     }
     
     private fun getImageRotation(context: Context, imgUri: Uri): Float {
