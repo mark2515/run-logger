@@ -240,6 +240,7 @@ class UserProfileActivity : AppCompatActivity() {
             myViewModel.userImage.value = originalAvatar
         } else {
             myViewModel.userImage.value = null
+            imageView.setImageResource(R.drawable.default_avatar)
         }
     }
     

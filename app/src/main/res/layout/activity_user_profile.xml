@@ -21,10 +21,11 @@
             <ImageView
                 android:id="@+id/imageProfile"
                 android:layout_width="120dp"
-                android:layout_height="120dp"
+                android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:scaleType="centerCrop"
-                android:background="@drawable/ic_launcher_background" />
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter" 
+                android:src="@drawable/default_avatar" />
 
             <Button
                 android:id="@+id/btnChangePhoto"
