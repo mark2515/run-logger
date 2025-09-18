@@ -166,6 +166,11 @@ class UserProfileActivity : AppCompatActivity() {
     }
     
     private fun loadSavedAvatar() {
+        if (!Util.hasMediaPermission(this)) {
+            imageView.setImageResource(R.drawable.default_avatar)
+            return
+        }
+        
         val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
         if (savedImgFile.exists() && sharedPreferences.getBoolean(KEY_HAS_AVATAR, false)) {
             try {
@@ -176,7 +181,10 @@ class UserProfileActivity : AppCompatActivity() {
                 imageView.setImageBitmap(bitmap)
             } catch (e: Exception) {
                 Log.e(TAG, "Error loading saved avatar", e)
+                imageView.setImageResource(R.drawable.default_avatar)
             }
+        } else {
+            imageView.setImageResource(R.drawable.default_avatar)
         }
     }
 

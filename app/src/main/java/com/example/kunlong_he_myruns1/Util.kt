@@ -42,6 +42,14 @@ object Util {
             ActivityCompat.requestPermissions(a, needed.toTypedArray(), 100)
         }
     }
+    
+    fun hasMediaPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= 33) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+    }
 
     fun getBitmap(context: Context, imgUri: Uri): Bitmap {
         var bitmap = BitmapFactory.decodeStream(context.contentResolver.openInputStream(imgUri))
@@ -60,7 +68,6 @@ object Util {
         
         return try {
             val ret = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-            // Recycle original bitmap if it's different from the returned one
             if (ret != bitmap) {
                 bitmap.recycle()
             }
