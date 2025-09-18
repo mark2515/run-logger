@@ -127,7 +127,9 @@ class UserProfileActivity : AppCompatActivity() {
             imageView.setImageBitmap(bitmap)
         }
 
-        loadSavedAvatar()
+        if (myViewModel.userImage.value == null) {
+            loadSavedAvatar()
+        }
     }
     
     private fun loadSavedAvatar() {

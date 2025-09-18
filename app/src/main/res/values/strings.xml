@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Kunlong_He_MyRuns1</string>
     <string name="user_profile">User Profile</string>
+    <string name="profile_photo">Profile Photo</string>
     <string name="name">Name</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>
