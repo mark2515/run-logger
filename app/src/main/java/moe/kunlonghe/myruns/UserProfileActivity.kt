@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -43,6 +44,8 @@ class UserProfileActivity : AppCompatActivity() {
         private const val KEY_MAJOR = "major"
         private const val KEY_HAS_AVATAR = "has_avatar"
         private const val BUNDLE_TEMP_IMG_URI = "temp_img_uri"
+        private const val BUNDLE_HAS_UNSAVED_IMAGE = "has_unsaved_image"
+        private const val BUNDLE_TEMP_IMAGE_PATH = "temp_image_path"
     }
     
     private lateinit var editTextName: EditText
@@ -65,6 +68,7 @@ class UserProfileActivity : AppCompatActivity() {
     
     private val tempImgFileName = "xd_temp_img.jpg"
     private val savedImgFileName = "user_avatar.jpg"
+    private val stateImgFileName = "state_temp_img.jpg"
     
     private var originalAvatar: Bitmap? = null
 
@@ -82,23 +86,55 @@ class UserProfileActivity : AppCompatActivity() {
         setupClickListeners()
         setupCamera()
         
+        // Restore state if available
         savedInstanceState?.let {
             val uriString = it.getString(BUNDLE_TEMP_IMG_URI)
             if (uriString != null) {
                 tempImgUri = Uri.parse(uriString)
+            }
+            
+            val hasUnsavedImage = it.getBoolean(BUNDLE_HAS_UNSAVED_IMAGE, false)
+            val tempImagePath = it.getString(BUNDLE_TEMP_IMAGE_PATH)
+            
+            if (hasUnsavedImage && tempImagePath != null) {
+                myViewModel.hasUnsavedImage = hasUnsavedImage
+                myViewModel.tempImagePath = tempImagePath
+                restoreUnsavedImage(tempImagePath)
+            }
+        }
+        
+        myViewModel.userImage.observe(this) { bitmap ->
+            if (bitmap != null) {
+                imageView.setImageBitmap(bitmap)
+            } else {
+                imageView.setImageResource(R.drawable.default_avatar)
             }
         }
     }
     
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        
+        // Save URI
         tempImgUri?.let {
             outState.putString(BUNDLE_TEMP_IMG_URI, it.toString())
+        }
+        
+        // Save unsaved image state
+        outState.putBoolean(BUNDLE_HAS_UNSAVED_IMAGE, myViewModel.hasUnsavedImage)
+        
+        if (myViewModel.hasUnsavedImage && myViewModel.userImage.value != null) {
+            val stateImagePath = saveImageToStateFile(myViewModel.userImage.value!!)
+            if (stateImagePath != null) {
+                outState.putString(BUNDLE_TEMP_IMAGE_PATH, stateImagePath)
+                myViewModel.tempImagePath = stateImagePath
+            }
         }
     }
     
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        Log.d(TAG, "onConfigurationChanged() called")
     }
     
     private fun setupWindowInsets() {
@@ -142,11 +178,7 @@ class UserProfileActivity : AppCompatActivity() {
                     try {
                         val bitmap = Util.getBitmap(this, uri)
                         myViewModel.userImage.value = bitmap
-                        
-                        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
-                        if (tempImgFile.exists()) {
-                            tempImgFile.delete()
-                        }
+                        myViewModel.hasUnsavedImage = true
                     } catch (e: Exception) {
                         Log.e(TAG, "Error processing camera result", e)
                         Toast.makeText(this, "Error processing photo", Toast.LENGTH_SHORT).show()
@@ -156,38 +188,11 @@ class UserProfileActivity : AppCompatActivity() {
         }
 
         myViewModel = ViewModelProvider(this)[MyViewModel::class.java]
-        myViewModel.userImage.observe(this) { bitmap ->
-            imageView.setImageBitmap(bitmap)
-        }
-
-        if (myViewModel.userImage.value == null) {
-            loadSavedAvatar()
-        }
+        
+        // Load saved avatar if exists
+        loadSavedAvatar()
     }
     
-    private fun loadSavedAvatar() {
-        if (!Util.hasMediaPermission(this)) {
-            imageView.setImageResource(R.drawable.default_avatar)
-            return
-        }
-        
-        val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
-        if (savedImgFile.exists() && sharedPreferences.getBoolean(KEY_HAS_AVATAR, false)) {
-            try {
-                val savedImgUri = Uri.fromFile(savedImgFile)
-                val bitmap = Util.getBitmap(this, savedImgUri)
-                originalAvatar = bitmap
-                myViewModel.userImage.value = bitmap
-                imageView.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                Log.e(TAG, "Error loading saved avatar", e)
-                imageView.setImageResource(R.drawable.default_avatar)
-            }
-        } else {
-            imageView.setImageResource(R.drawable.default_avatar)
-        }
-    }
-
     private fun initializeSharedPreferences() {
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
@@ -219,6 +224,7 @@ class UserProfileActivity : AppCompatActivity() {
         
         buttonCancel.setOnClickListener {
             restoreOriginalAvatar()
+            cleanupTempFiles()
             finish()
         }
         
@@ -266,6 +272,9 @@ class UserProfileActivity : AppCompatActivity() {
         editor.putString(KEY_CLASS, classYear)
         editor.putString(KEY_MAJOR, major)
         editor.apply()
+        
+        myViewModel.hasUnsavedImage = false
+        cleanupTempFiles()
                 
         Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show()
         finish()
@@ -274,6 +283,11 @@ class UserProfileActivity : AppCompatActivity() {
     private fun saveAvatarPermanently() {
         val currentAvatar = myViewModel.userImage.value
         if (currentAvatar != null) {
+            if (!Util.hasMediaPermission(this)) {
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_LONG).show()
+                return
+            }
+            
             try {
                 val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
                 val fileOutputStream = FileOutputStream(savedImgFile)
@@ -298,10 +312,76 @@ class UserProfileActivity : AppCompatActivity() {
             myViewModel.userImage.value = null
             imageView.setImageResource(R.drawable.default_avatar)
         }
+        myViewModel.hasUnsavedImage = false
+    }
+    
+    private fun loadSavedAvatar() {
+        val hasAvatar = sharedPreferences.getBoolean(KEY_HAS_AVATAR, false)
+        if (hasAvatar) {
+            try {
+                val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
+                if (savedImgFile.exists()) {
+                    val bitmap = BitmapFactory.decodeFile(savedImgFile.absolutePath)
+                    originalAvatar = bitmap
+                    myViewModel.userImage.value = bitmap
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error loading saved avatar", e)
+            }
+        }
+    }
+    
+    private fun saveImageToStateFile(bitmap: Bitmap): String? {
+        return try {
+            val stateImgFile = File(getExternalFilesDir(null), stateImgFileName)
+            val fileOutputStream = FileOutputStream(stateImgFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+            stateImgFile.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "Error saving state image", e)
+            null
+        }
+    }
+    
+    private fun restoreUnsavedImage(imagePath: String) {
+        try {
+            val imageFile = File(imagePath)
+            if (imageFile.exists()) {
+                val bitmap = BitmapFactory.decodeFile(imagePath)
+                if (bitmap != null) {
+                    myViewModel.userImage.value = bitmap
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error restoring unsaved image", e)
+        }
+    }
+    
+    private fun cleanupTempFiles() {
+        try {
+            // Clean up camera temp file
+            val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+            if (tempImgFile.exists()) {
+                tempImgFile.delete()
+            }
+            
+            // Clean up state temp file
+            val stateImgFile = File(getExternalFilesDir(null), stateImgFileName)
+            if (stateImgFile.exists()) {
+                stateImgFile.delete()
+            }
+            
+            myViewModel.tempImagePath = null
+        } catch (e: Exception) {
+            Log.e(TAG, "Error cleaning up temp files", e)
+        }
     }
     
     override fun onBackPressed() {
         restoreOriginalAvatar()
+        cleanupTempFiles()
         super.onBackPressed()
     }
     
@@ -319,9 +399,8 @@ class UserProfileActivity : AppCompatActivity() {
         super.onDestroy()
         Log.d(TAG, "onDestroy() called")
         
-        val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
-        if (tempImgFile.exists()) {
-            tempImgFile.delete()
+        if (!myViewModel.hasUnsavedImage || isFinishing) {
+            cleanupTempFiles()
         }
     }
 }

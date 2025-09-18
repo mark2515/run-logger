@@ -6,4 +6,6 @@ import androidx.lifecycle.ViewModel
 
 class MyViewModel : ViewModel() {
     val userImage = MutableLiveData<Bitmap>()
+    var hasUnsavedImage = false
+    var tempImagePath: String? = null
 }
