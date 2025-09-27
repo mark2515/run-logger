@@ -31,7 +31,7 @@ import androidx.core.view.updatePadding
 import java.io.File
 import java.io.FileOutputStream
 
-class UserProfileActivity : AppCompatActivity() {
+class UserProfileActivity : AppCompatActivity(), MyDialog.ProfilePhotoDialogListener {
     
     companion object {
         private const val TAG = "UserProfileActivity"
@@ -65,6 +65,7 @@ class UserProfileActivity : AppCompatActivity() {
     private var tempImgUri: Uri? = null
     private lateinit var myViewModel: MyViewModel
     private lateinit var cameraResult: ActivityResultLauncher<Intent>
+    private lateinit var galleryResult: ActivityResultLauncher<Intent>
     
     private val tempImgFileName = "xd_temp_img.jpg"
     private val savedImgFileName = "user_avatar.jpg"
@@ -172,6 +173,7 @@ class UserProfileActivity : AppCompatActivity() {
             tempImgUri = FileProvider.getUriForFile(this, "moe.kunlonghe.myruns.fileprovider", tempImgFile)
         }
 
+        // Camera result launcher
         cameraResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == Activity.RESULT_OK) {
                 tempImgUri?.let { uri ->
@@ -181,6 +183,22 @@ class UserProfileActivity : AppCompatActivity() {
                         myViewModel.hasUnsavedImage = true
                     } catch (e: Exception) {
                         Log.e(TAG, "Error processing camera result", e)
+                        Toast.makeText(this, "Error processing photo", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        // Gallery result launcher
+        galleryResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    try {
+                        val bitmap = Util.getBitmap(this, uri)
+                        myViewModel.userImage.value = bitmap
+                        myViewModel.hasUnsavedImage = true
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error processing gallery result", e)
                         Toast.makeText(this, "Error processing photo", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -229,23 +247,42 @@ class UserProfileActivity : AppCompatActivity() {
         }
         
         btnChangePhoto.setOnClickListener {
-            tempImgUri?.let { uri ->
-                val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
-                if (!tempImgFile.exists()) {
-                    try {
-                        tempImgFile.createNewFile()
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Error creating temp file", e)
-                        Toast.makeText(this, "Error preparing camera", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                }
-                
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                cameraResult.launch(intent)
-            }
+            showProfilePhotoDialog()
         }
+    }
+    
+    private fun showProfilePhotoDialog() {
+        val dialog = MyDialog()
+        val bundle = Bundle()
+        bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.PROFILE_PHOTO_DIALOG)
+        dialog.arguments = bundle
+        dialog.setProfilePhotoDialogListener(this)
+        dialog.show(supportFragmentManager, "ProfilePhotoDialog")
+    }
+    
+    override fun onOpenCamera() {
+        tempImgUri?.let { uri ->
+            val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
+            if (!tempImgFile.exists()) {
+                try {
+                    tempImgFile.createNewFile()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error creating temp file", e)
+                    Toast.makeText(this, "Error preparing camera", Toast.LENGTH_SHORT).show()
+                    return
+                }
+            }
+            
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            cameraResult.launch(intent)
+        }
+    }
+    
+    override fun onSelectFromGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        galleryResult.launch(intent)
     }
     
     private fun saveUserProfile() {        
