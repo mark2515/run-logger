@@ -280,6 +280,11 @@ class UserProfileActivity : AppCompatActivity(), MyDialog.ProfilePhotoDialogList
     }
     
     override fun onSelectFromGallery() {
+        if (!Util.hasMediaPermission(this)) {
+            Toast.makeText(this, "Storage permission denied. Cannot access gallery.", Toast.LENGTH_LONG).show()
+            return
+        }
+        
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.type = "image/*"
         galleryResult.launch(intent)
@@ -320,11 +325,6 @@ class UserProfileActivity : AppCompatActivity(), MyDialog.ProfilePhotoDialogList
     private fun saveAvatarPermanently() {
         val currentAvatar = myViewModel.userImage.value
         if (currentAvatar != null) {
-            if (!Util.hasMediaPermission(this)) {
-                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_LONG).show()
-                return
-            }
-            
             try {
                 val savedImgFile = File(getExternalFilesDir(null), savedImgFileName)
                 val fileOutputStream = FileOutputStream(savedImgFile)
