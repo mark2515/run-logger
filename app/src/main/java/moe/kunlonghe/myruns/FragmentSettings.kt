@@ -48,7 +48,6 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
         commentsDescriptionTextView = view.findViewById(R.id.commentsDescriptionTextView)
         
         updateUnitPreferenceDisplay()
-        updateCommentsDisplay()
         
         return view
     }
@@ -76,7 +75,7 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
     }
 
     override fun onCommentsUpdated(comments: String) {
-        updateCommentsDisplay()
+        // Comments dialog callback
     }
     
     private fun updateUnitPreferenceDisplay() {
@@ -85,17 +84,5 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
         
         val unitText = if (isMetric) "Metric (Kilometers)" else "Imperial (Miles)"
         unitDescriptionTextView.text = unitText
-    }
-    
-    private fun updateCommentsDisplay() {
-        val sharedPrefs = requireActivity().getSharedPreferences(MyDialog.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-        val savedComments = sharedPrefs.getString(MyDialog.COMMENTS_KEY, "")
-        
-        val displayText = if (savedComments.isNullOrEmpty()) {
-            "Please enter your comments"
-        } else {
-            savedComments
-        }
-        commentsDescriptionTextView.text = displayText
     }
 }

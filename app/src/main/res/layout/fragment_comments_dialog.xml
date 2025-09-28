@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:gravity="top|start"
-        android:hint="Enter your comments here..."
         android:inputType="textMultiLine"
         android:background="@android:drawable/edit_text"
         android:padding="12dp"
