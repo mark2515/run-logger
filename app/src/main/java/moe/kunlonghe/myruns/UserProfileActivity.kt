@@ -166,8 +166,6 @@ class UserProfileActivity : AppCompatActivity(), MyDialog.ProfilePhotoDialogList
     }
     
     private fun setupCamera() {
-        Util.requestAllPermissions(this)
-
         if (tempImgUri == null) {
             val tempImgFile = File(getExternalFilesDir(null), tempImgFileName)
             tempImgUri = FileProvider.getUriForFile(this, "moe.kunlonghe.myruns.fileprovider", tempImgFile)

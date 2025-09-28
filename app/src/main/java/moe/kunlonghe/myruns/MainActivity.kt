@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        Util.requestAllPermissions(this)
+
         viewPager2 = findViewById(R.id.viewpager)
         tabLayout = findViewById(R.id.tab)
 
