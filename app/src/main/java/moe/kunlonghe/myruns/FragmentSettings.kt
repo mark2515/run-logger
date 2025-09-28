@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
+import android.widget.Toast
 
 class FragmentSettings : Fragment() {
     
@@ -26,6 +27,12 @@ class FragmentSettings : Fragment() {
         
         privacySettingLayout.setOnClickListener {
             privacyCheckBox.isChecked = !privacyCheckBox.isChecked
+        }
+        
+        val unitPreferenceLayout = view.findViewById<LinearLayout>(R.id.unitPreferenceLayout)
+        unitPreferenceLayout.setOnClickListener {
+            // show unit preference dialog
+            Toast.makeText(requireContext(), "Unit Preference dialog will be shown here", Toast.LENGTH_SHORT).show()
         }
         
         return view
