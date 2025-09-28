@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 
 class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
     
@@ -39,10 +38,8 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
             showUnitPreferenceDialog()
         }
         
-        // Get reference to the unit description TextView to update it
         unitDescriptionTextView = view.findViewById(R.id.unitDescriptionTextView)
         
-        // Load and display current unit preference
         updateUnitPreferenceDisplay()
         
         return view
@@ -58,10 +55,6 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
     }
 
     override fun onUnitSelected(isMetric: Boolean) {
-        val unitType = if (isMetric) "Metric (Kilometers)" else "Imperial (Miles)"
-        Toast.makeText(requireContext(), "Selected: $unitType", Toast.LENGTH_SHORT).show()
-        
-        // Update the display to show the new selection
         updateUnitPreferenceDisplay()
     }
     
