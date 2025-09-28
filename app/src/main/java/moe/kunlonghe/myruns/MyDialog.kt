@@ -17,7 +17,9 @@ class MyDialog : DialogFragment(), View.OnClickListener {
         const val TEST_DIALOG = 1
         const val PROFILE_PHOTO_DIALOG = 2
         const val UNIT_PREFERENCE_DIALOG = 3
+        const val COMMENTS_DIALOG = 4
         const val UNIT_PREFERENCE_KEY = "unit_preference"
+        const val COMMENTS_KEY = "user_comments"
         const val SHARED_PREFS_NAME = "MyRunsPrefs"
     }
 
@@ -30,8 +32,13 @@ class MyDialog : DialogFragment(), View.OnClickListener {
         fun onUnitSelected(isMetric: Boolean)
     }
 
+    interface CommentsDialogListener {
+        fun onCommentsUpdated(comments: String)
+    }
+
     private var profilePhotoListener: ProfilePhotoDialogListener? = null
     private var unitPreferenceListener: UnitPreferenceDialogListener? = null
+    private var commentsListener: CommentsDialogListener? = null
 
     fun setProfilePhotoDialogListener(listener: ProfilePhotoDialogListener) {
         profilePhotoListener = listener
@@ -39,6 +46,10 @@ class MyDialog : DialogFragment(), View.OnClickListener {
 
     fun setUnitPreferenceDialogListener(listener: UnitPreferenceDialogListener) {
         unitPreferenceListener = listener
+    }
+
+    fun setCommentsDialogListener(listener: CommentsDialogListener) {
+        commentsListener = listener
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -114,6 +125,29 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 
                 builder.setView(view)
                 builder.setTitle("Unit Preference")
+                builder.setNegativeButton("CANCEL") { _, _ ->
+                    // Handle cancel click
+                }
+                ret = builder.create()
+            }
+
+            COMMENTS_DIALOG -> {
+                val builder = AlertDialog.Builder(requireActivity())
+                val view: View = requireActivity().layoutInflater.inflate(R.layout.fragment_comments_dialog, null)
+                
+                val editTextComments = view.findViewById<android.widget.EditText>(R.id.editTextComments)
+                
+                val sharedPrefs = requireActivity().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+                val savedComments = sharedPrefs.getString(COMMENTS_KEY, "")
+                editTextComments.setText(savedComments)
+                
+                builder.setView(view)
+                builder.setTitle("Comments")
+                builder.setPositiveButton("OK") { _, _ ->
+                    val comments = editTextComments.text.toString()
+                    sharedPrefs.edit().putString(COMMENTS_KEY, comments).apply()
+                    commentsListener?.onCommentsUpdated(comments)
+                }
                 builder.setNegativeButton("CANCEL") { _, _ ->
                     // Handle cancel click
                 }

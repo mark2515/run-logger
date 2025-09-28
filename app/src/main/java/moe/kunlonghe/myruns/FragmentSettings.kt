@@ -11,9 +11,10 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 
-class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
+class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDialog.CommentsDialogListener {
     
     private lateinit var unitDescriptionTextView: TextView
+    private lateinit var commentsDescriptionTextView: TextView
     
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -38,9 +39,16 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
             showUnitPreferenceDialog()
         }
         
+        val commentsLayout = view.findViewById<LinearLayout>(R.id.commentsLayout)
+        commentsLayout.setOnClickListener {
+            showCommentsDialog()
+        }
+        
         unitDescriptionTextView = view.findViewById(R.id.unitDescriptionTextView)
+        commentsDescriptionTextView = view.findViewById(R.id.commentsDescriptionTextView)
         
         updateUnitPreferenceDisplay()
+        updateCommentsDisplay()
         
         return view
     }
@@ -54,8 +62,21 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
         dialog.show(parentFragmentManager, "UnitPreferenceDialog")
     }
 
+    private fun showCommentsDialog() {
+        val dialog = MyDialog()
+        val bundle = Bundle()
+        bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.COMMENTS_DIALOG)
+        dialog.arguments = bundle
+        dialog.setCommentsDialogListener(this)
+        dialog.show(parentFragmentManager, "CommentsDialog")
+    }
+
     override fun onUnitSelected(isMetric: Boolean) {
         updateUnitPreferenceDisplay()
+    }
+
+    override fun onCommentsUpdated(comments: String) {
+        updateCommentsDisplay()
     }
     
     private fun updateUnitPreferenceDisplay() {
@@ -64,5 +85,17 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener {
         
         val unitText = if (isMetric) "Metric (Kilometers)" else "Imperial (Miles)"
         unitDescriptionTextView.text = unitText
+    }
+    
+    private fun updateCommentsDisplay() {
+        val sharedPrefs = requireActivity().getSharedPreferences(MyDialog.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        val savedComments = sharedPrefs.getString(MyDialog.COMMENTS_KEY, "")
+        
+        val displayText = if (savedComments.isNullOrEmpty()) {
+            "Please enter your comments"
+        } else {
+            savedComments
+        }
+        commentsDescriptionTextView.text = displayText
     }
 }
