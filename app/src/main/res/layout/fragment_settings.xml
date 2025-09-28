@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="28sp"
-        android:text="This is Fragment Settings" />
-</LinearLayout>
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Account Preferences"
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+        <LinearLayout
+            android:id="@+id/userProfileLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name, Email, Class, etc"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingBottom="4dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User Profile"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+    </LinearLayout>
+
+</ScrollView>
