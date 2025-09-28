@@ -131,9 +131,10 @@
                 android:paddingBottom="4dp" />
 
             <TextView
+                android:id="@+id/unitDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Select the units"
+                android:text="Metric (Kilometers)"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray" />
 
