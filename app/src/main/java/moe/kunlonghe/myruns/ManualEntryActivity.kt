@@ -3,7 +3,9 @@ package moe.kunlonghe.myruns
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.text.InputType
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,6 +63,26 @@ class ManualEntryActivity : AppCompatActivity() {
         textViewTime.setOnClickListener {
             showTimePickerDialog()
         }
+        
+        textViewDuration.setOnClickListener {
+            showNumberInputDialog("Duration", "mins") { value ->
+            }
+        }
+        
+        textViewDistance.setOnClickListener {
+            showNumberInputDialog("Distance", "miles") { value ->
+            }
+        }
+        
+        textViewCalories.setOnClickListener {
+            showNumberInputDialog("Calories", "cals") { value ->
+            }
+        }
+        
+        textViewHeartRate.setOnClickListener {
+            showNumberInputDialog("Heart Rate", "bpm") { value ->
+            }
+        }
     }
     
     private fun setupButtons() {
@@ -102,5 +124,24 @@ class ManualEntryActivity : AppCompatActivity() {
         )
         
         timePickerDialog.show()
+    }
+    
+    private fun showNumberInputDialog(title: String, unit: String, onValueSet: (String) -> Unit) {
+        val editText = EditText(this)
+        editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+        
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setView(editText)
+            .setPositiveButton("OK") { _, _ ->
+                val value = editText.text.toString()
+                if (value.isNotEmpty()) {
+                    onValueSet(value)
+                }
+            }
+            .setNegativeButton("CANCEL", null)
+            .create()
+        
+        dialog.show()
     }
 }
