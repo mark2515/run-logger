@@ -1,6 +1,7 @@
 package moe.kunlonghe.myruns
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +57,10 @@ class ManualEntryActivity : AppCompatActivity() {
         textViewDate.setOnClickListener {
             showDatePickerDialog()
         }
+        
+        textViewTime.setOnClickListener {
+            showTimePickerDialog()
+        }
     }
     
     private fun setupButtons() {
@@ -82,5 +87,20 @@ class ManualEntryActivity : AppCompatActivity() {
         )
         
         datePickerDialog.show()
+    }
+    
+    private fun showTimePickerDialog() {
+        val timePickerDialog = TimePickerDialog(
+            this,
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+            },
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
+        )
+        
+        timePickerDialog.show()
     }
 }
