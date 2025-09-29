@@ -53,8 +53,9 @@ class ManualEntryActivity : AppCompatActivity() {
         buttonSave = findViewById(R.id.button_save)
         buttonCancel = findViewById(R.id.button_cancel)
         
-        // Set current date as default
-        updateDateDisplay()
+        textViewDate.setOnClickListener {
+            showDatePickerDialog()
+        }
     }
     
     private fun setupButtons() {
@@ -74,7 +75,6 @@ class ManualEntryActivity : AppCompatActivity() {
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, month)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                updateDateDisplay()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -82,10 +82,5 @@ class ManualEntryActivity : AppCompatActivity() {
         )
         
         datePickerDialog.show()
-    }
-    
-    private fun updateDateDisplay() {
-        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
-        textViewDate.text = dateFormat.format(calendar.time)
     }
 }
