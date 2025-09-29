@@ -40,6 +40,12 @@
             android:label="Map"
             android:theme="@style/Theme.Kunlong_He_MyRuns2" />
 
+        <activity
+            android:name=".ManualEntryActivity"
+            android:exported="false"
+            android:label="Manual Entry"
+            android:theme="@style/Theme.Kunlong_He_MyRuns2" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="moe.kunlonghe.myruns.fileprovider"

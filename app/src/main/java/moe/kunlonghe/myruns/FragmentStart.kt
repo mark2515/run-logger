@@ -69,6 +69,10 @@ class FragmentStart : Fragment() {
                     startActivity(intent)
                 }
                 "Manual Entry" -> {
+                    val intent = Intent(requireContext(), ManualEntryActivity::class.java)
+                    intent.putExtra("INPUT_TYPE", inputType)
+                    intent.putExtra("ACTIVITY_TYPE", activityType)
+                    startActivity(intent)
                 }
             }
         }

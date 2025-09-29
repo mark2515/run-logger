@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Account Preferences -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -100,6 +101,7 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
+        <!-- Additional Settings -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -178,6 +180,7 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
+        <!-- Misc. -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
