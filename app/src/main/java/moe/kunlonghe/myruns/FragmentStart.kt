@@ -69,7 +69,6 @@ class FragmentStart : Fragment() {
                     startActivity(intent)
                 }
                 "Manual Entry" -> {
-                    Toast.makeText(requireContext(), "Manual Entry selected", Toast.LENGTH_SHORT).show()
                 }
             }
         }

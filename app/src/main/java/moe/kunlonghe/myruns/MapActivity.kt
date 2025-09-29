@@ -2,7 +2,6 @@ package moe.kunlonghe.myruns
 
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MapActivity : AppCompatActivity() {
@@ -26,14 +25,10 @@ class MapActivity : AppCompatActivity() {
         
         // Setup button listeners
         setupButtons()
-        
-        // Show toast with the selected options
-        Toast.makeText(this, "Starting $activityType with $inputType", Toast.LENGTH_SHORT).show()
     }
     
     private fun setupButtons() {
         buttonSave.setOnClickListener {
-            Toast.makeText(this, "Save functionality to be implemented", Toast.LENGTH_SHORT).show()
             finish()
         }
         
