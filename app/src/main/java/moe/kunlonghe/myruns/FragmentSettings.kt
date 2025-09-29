@@ -2,6 +2,7 @@ package moe.kunlonghe.myruns
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -46,6 +47,13 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
         
         unitDescriptionTextView = view.findViewById(R.id.unitDescriptionTextView)
         commentsDescriptionTextView = view.findViewById(R.id.commentsDescriptionTextView)
+        
+        // Webpage functionality
+        val webpageLayout = view.findViewById<LinearLayout>(R.id.webpageLayout)
+        webpageLayout.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.sfu.ca/computing.html"))
+            startActivity(intent)
+        }
         
         updateUnitPreferenceDisplay()
         

@@ -178,6 +178,51 @@
             android:layout_height="1dp"
             android:background="@android:color/darker_gray" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Misc."
+            android:textSize="18sp"
+            android:textColor="@android:color/holo_blue_dark"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+        <LinearLayout
+            android:id="@+id/webpageLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Webpage"
+                android:textSize="16sp"
+                android:textColor="@android:color/black"
+                android:paddingBottom="4dp" />
+
+            <TextView
+                android:id="@+id/commentsDescriptionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="https://www.sfu.ca/computing.html"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
     </LinearLayout>
 
 </ScrollView>
