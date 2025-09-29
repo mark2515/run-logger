@@ -1,23 +1,29 @@
 package moe.kunlonghe.myruns
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ManualEntryActivity : AppCompatActivity() {
     
-    private lateinit var editTextDate: EditText
-    private lateinit var editTextTime: EditText
-    private lateinit var editTextDuration: EditText
-    private lateinit var editTextDistance: EditText
-    private lateinit var editTextCalories: EditText
-    private lateinit var editTextHeartRate: EditText
-    private lateinit var editTextComment: EditText
+    private lateinit var textViewDate: TextView
+    private lateinit var textViewTime: TextView
+    private lateinit var textViewDuration: TextView
+    private lateinit var textViewDistance: TextView
+    private lateinit var textViewCalories: TextView
+    private lateinit var textViewHeartRate: TextView
+    private lateinit var textViewComment: TextView
     private lateinit var buttonSave: Button
     private lateinit var buttonCancel: Button
     
     private var inputType: String? = null
     private var activityType: String? = null
+    
+    // Calendar instance for date picker
+    private val calendar = Calendar.getInstance()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,23 +43,23 @@ class ManualEntryActivity : AppCompatActivity() {
     }
     
     private fun initializeViews() {
-        editTextDate = findViewById(R.id.edittext_date)
-        editTextTime = findViewById(R.id.edittext_time)
-        editTextDuration = findViewById(R.id.edittext_duration)
-        editTextDistance = findViewById(R.id.edittext_distance)
-        editTextCalories = findViewById(R.id.edittext_calories)
-        editTextHeartRate = findViewById(R.id.edittext_heart_rate)
-        editTextComment = findViewById(R.id.edittext_comment)
+        textViewDate = findViewById(R.id.textview_date)
+        textViewTime = findViewById(R.id.textview_time)
+        textViewDuration = findViewById(R.id.textview_duration)
+        textViewDistance = findViewById(R.id.textview_distance)
+        textViewCalories = findViewById(R.id.textview_calories)
+        textViewHeartRate = findViewById(R.id.textview_heart_rate)
+        textViewComment = findViewById(R.id.textview_comment)
         buttonSave = findViewById(R.id.button_save)
         buttonCancel = findViewById(R.id.button_cancel)
+        
+        // Set current date as default
+        updateDateDisplay()
     }
     
     private fun setupButtons() {
         buttonSave.setOnClickListener {
-            if (validateInput()) {
-                saveEntry()
-                finish()
-            }
+            finish()
         }
         
         buttonCancel.setOnClickListener {
@@ -61,29 +67,25 @@ class ManualEntryActivity : AppCompatActivity() {
         }
     }
     
-    private fun validateInput(): Boolean {
-        if (editTextDuration.text.toString().trim().isEmpty()) {
-            Toast.makeText(this, "Please enter duration", Toast.LENGTH_SHORT).show()
-            return false
-        }
+    private fun showDatePickerDialog() {
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                updateDateDisplay()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
         
-        if (editTextDistance.text.toString().trim().isEmpty()) {
-            Toast.makeText(this, "Please enter distance", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        
-        return true
+        datePickerDialog.show()
     }
     
-    private fun saveEntry() {
-        val date = editTextDate.text.toString()
-        val time = editTextTime.text.toString()
-        val duration = editTextDuration.text.toString()
-        val distance = editTextDistance.text.toString()
-        val calories = editTextCalories.text.toString()
-        val heartRate = editTextHeartRate.text.toString()
-        val comment = editTextComment.text.toString()
-        
-        Toast.makeText(this, "Entry saved successfully!", Toast.LENGTH_SHORT).show()
+    private fun updateDateDisplay() {
+        val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+        textViewDate.text = dateFormat.format(calendar.time)
     }
 }

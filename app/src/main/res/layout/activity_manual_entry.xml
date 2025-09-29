@@ -17,123 +17,107 @@
 
             <!-- Date -->
             <TextView
+                android:id="@+id/textview_date"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Date"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="MM/DD/YYYY"
-                android:inputType="date"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Time -->
             <TextView
+                android:id="@+id/textview_time"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Time"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="HH:MM AM/PM"
-                android:inputType="time"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Duration -->
             <TextView
+                android:id="@+id/textview_duration"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Duration"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_duration"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter duration"
-                android:inputType="numberDecimal"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Distance -->
             <TextView
+                android:id="@+id/textview_distance"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Distance"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_distance"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter distance"
-                android:inputType="numberDecimal"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Calories -->
             <TextView
+                android:id="@+id/textview_calories"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Calories"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_calories"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter calories burned"
-                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Heart Rate -->
             <TextView
+                android:id="@+id/textview_heart_rate"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Heart Rate"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_heart_rate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter heart rate"
-                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Comment -->
             <TextView
+                android:id="@+id/textview_comment"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:text="Comment"
                 android:textSize="16sp"
-                android:textColor="@android:color/darker_gray"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:id="@+id/edittext_comment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Add a comment"
-                android:inputType="textMultiLine"
-                android:minLines="3"
-                android:gravity="top"
+                android:textColor="@android:color/black"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:padding="12dp"
                 android:layout_marginBottom="16dp" />
 
         </LinearLayout>
