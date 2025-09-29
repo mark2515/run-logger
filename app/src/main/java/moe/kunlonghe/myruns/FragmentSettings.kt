@@ -14,7 +14,6 @@ import android.widget.TextView
 
 class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDialog.CommentsDialogListener {
     
-    private lateinit var unitDescriptionTextView: TextView
     private lateinit var commentsDescriptionTextView: TextView
     
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +44,6 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
             showCommentsDialog()
         }
         
-        unitDescriptionTextView = view.findViewById(R.id.unitDescriptionTextView)
         commentsDescriptionTextView = view.findViewById(R.id.commentsDescriptionTextView)
         
         // Webpage functionality
@@ -54,8 +52,6 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.sfu.ca/computing.html"))
             startActivity(intent)
         }
-        
-        updateUnitPreferenceDisplay()
         
         return view
     }
@@ -79,18 +75,10 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
     }
 
     override fun onUnitSelected(isMetric: Boolean) {
-        updateUnitPreferenceDisplay()
+        // Unit selection is saved in MyDialog
     }
 
     override fun onCommentsUpdated(comments: String) {
         // Comments dialog callback
-    }
-    
-    private fun updateUnitPreferenceDisplay() {
-        val sharedPrefs = requireActivity().getSharedPreferences(MyDialog.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-        val isMetric = sharedPrefs.getBoolean(MyDialog.UNIT_PREFERENCE_KEY, true)
-        
-        val unitText = if (isMetric) "Metric (Kilometers)" else "Imperial (Miles)"
-        unitDescriptionTextView.text = unitText
     }
 }

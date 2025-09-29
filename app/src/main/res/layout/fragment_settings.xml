@@ -130,11 +130,11 @@
                 android:textColor="@android:color/black"
                 android:paddingBottom="4dp" />
 
-            <TextView
-                android:id="@+id/unitDescriptionTextView"
+             <TextView
+                android:id="@+id/commentsDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Metric (Kilometers)"
+                android:text="Select the units"
                 android:textSize="14sp"
                 android:textColor="@android:color/darker_gray" />
 
