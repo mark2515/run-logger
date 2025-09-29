@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ManualEntryActivity : AppCompatActivity() {
+class ManualEntryActivity : AppCompatActivity(), MyDialog.CommentsDialogListener {
     
     private lateinit var textViewDate: TextView
     private lateinit var textViewTime: TextView
@@ -83,6 +83,10 @@ class ManualEntryActivity : AppCompatActivity() {
             showNumberInputDialog("Heart Rate", "bpm") { value ->
             }
         }
+        
+        textViewComment.setOnClickListener {
+            showCommentsDialog()
+        }
     }
     
     private fun setupButtons() {
@@ -143,5 +147,17 @@ class ManualEntryActivity : AppCompatActivity() {
             .create()
         
         dialog.show()
+    }
+    
+    private fun showCommentsDialog() {
+        val dialog = MyDialog()
+        val bundle = Bundle()
+        bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.COMMENTS_DIALOG)
+        dialog.arguments = bundle
+        dialog.setCommentsDialogListener(this)
+        dialog.show(supportFragmentManager, "CommentsDialog")
+    }
+
+    override fun onCommentsUpdated(comments: String) {
     }
 }
