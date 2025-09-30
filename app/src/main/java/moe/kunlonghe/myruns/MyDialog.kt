@@ -136,15 +136,15 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 val radioMetric = view.findViewById<RadioButton>(R.id.radioMetric)
                 val radioImperial = view.findViewById<RadioButton>(R.id.radioImperial)
                 
-                // Load saved preference
                 val sharedPrefs = requireActivity().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-                val isMetric = sharedPrefs.getBoolean(UNIT_PREFERENCE_KEY, true)
-                
-                // Set the saved selection
-                if (isMetric) {
-                    radioMetric.isChecked = true
-                } else {
-                    radioImperial.isChecked = true
+                if (sharedPrefs.contains(UNIT_PREFERENCE_KEY)) {
+                    val isMetric = sharedPrefs.getBoolean(UNIT_PREFERENCE_KEY, false)
+                    // Set the saved selection
+                    if (isMetric) {
+                        radioMetric.isChecked = true
+                    } else {
+                        radioImperial.isChecked = true
+                    }
                 }
                 
                 radioGroup.setOnCheckedChangeListener { _, checkedId ->
