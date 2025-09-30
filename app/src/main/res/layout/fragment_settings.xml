@@ -133,7 +133,7 @@
                 android:paddingBottom="4dp" />
 
              <TextView
-                android:id="@+id/commentsDescriptionTextView"
+                android:id="@+id/unitDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Select the units"
@@ -212,7 +212,7 @@
                 android:paddingBottom="4dp" />
 
             <TextView
-                android:id="@+id/commentsDescriptionTextView"
+                android:id="@+id/webpageDescriptionTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="https://www.sfu.ca/computing.html"
