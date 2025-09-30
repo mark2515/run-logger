@@ -30,6 +30,7 @@ class MyDialog : DialogFragment(), View.OnClickListener {
         
         const val UNIT_PREFERENCE_KEY = "unit_preference"
         const val COMMENTS_KEY = "user_comments"
+        const val PRIVACY_KEY = "privacy_setting"
         const val SHARED_PREFS_NAME = "MyRunsPrefs"
         const val DIALOG_TITLE_KEY = "dialog_title"
         const val DIALOG_UNIT_KEY = "dialog_unit"

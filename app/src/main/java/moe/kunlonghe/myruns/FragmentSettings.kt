@@ -29,8 +29,14 @@ class FragmentSettings : Fragment(), MyDialog.UnitPreferenceDialogListener, MyDi
         val privacySettingLayout = view.findViewById<LinearLayout>(R.id.privacySettingLayout)
         val privacyCheckBox = view.findViewById<CheckBox>(R.id.privacyCheckBox)
         
+        // Restore privacy setting from SharedPreferences
+        val sharedPrefs = requireActivity().getSharedPreferences(MyDialog.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+        privacyCheckBox.isChecked = sharedPrefs.getBoolean(MyDialog.PRIVACY_KEY, false)
+        
         privacySettingLayout.setOnClickListener {
             privacyCheckBox.isChecked = !privacyCheckBox.isChecked
+            // Save privacy setting to SharedPreferences
+            sharedPrefs.edit().putBoolean(MyDialog.PRIVACY_KEY, privacyCheckBox.isChecked).apply()
         }
         
         val unitPreferenceLayout = view.findViewById<LinearLayout>(R.id.unitPreferenceLayout)
