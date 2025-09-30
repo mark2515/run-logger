@@ -190,13 +190,12 @@ class ManualEntryActivity : AppCompatActivity(),
         
         val dialog = MyDialog()
         val bundle = Bundle()
-        bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.COMMENTS_DIALOG)
+        bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.COMMENTS_DIALOG_NO_PERSIST)
         dialog.arguments = bundle
         dialog.setCommentsDialogListener(this)
         dialog.show(supportFragmentManager, COMMENTS_DIALOG_TAG)
     }
 
-    // Implement the dialog listener interfaces
     override fun onCommentsUpdated(comments: String) {
     }
     

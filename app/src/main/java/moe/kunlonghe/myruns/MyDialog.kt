@@ -26,6 +26,7 @@ class MyDialog : DialogFragment(), View.OnClickListener {
         const val DATE_PICKER_DIALOG = 5
         const val TIME_PICKER_DIALOG = 6
         const val NUMBER_INPUT_DIALOG = 7
+        const val COMMENTS_DIALOG_NO_PERSIST = 8
         
         const val UNIT_PREFERENCE_KEY = "unit_preference"
         const val COMMENTS_KEY = "user_comments"
@@ -188,6 +189,24 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 }
                 builder.setNegativeButton("CANCEL") { _, _ ->
                     // Handle cancel click
+                }
+                ret = builder.create()
+            }
+
+            COMMENTS_DIALOG_NO_PERSIST -> {
+                val builder = AlertDialog.Builder(requireActivity())
+                val view: View = requireActivity().layoutInflater.inflate(R.layout.fragment_comments_dialog, null)
+                
+                val editTextComments = view.findViewById<android.widget.EditText>(R.id.editTextComments)
+                editTextComments.setText("")
+                
+                builder.setView(view)
+                builder.setTitle("Comments")
+                builder.setPositiveButton("OK") { _, _ ->
+                    val comments = editTextComments.text.toString()
+                    commentsListener?.onCommentsUpdated(comments)
+                }
+                builder.setNegativeButton("CANCEL") { _, _ ->
                 }
                 ret = builder.create()
             }
