@@ -6,7 +6,7 @@
     android:padding="16dp"
     android:fitsSystemWindows="true"
     android:clipToPadding="false"
-    android:paddingTop="?attr/actionBarSize"
+    android:paddingTop="8dp"
     android:paddingBottom="16dp">
 
     <ScrollView
@@ -32,6 +32,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Time -->
@@ -47,6 +52,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Duration -->
@@ -62,6 +72,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Distance -->
@@ -77,6 +92,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Calories -->
@@ -92,6 +112,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Heart Rate -->
@@ -107,6 +132,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
             <!-- Comment -->
@@ -122,6 +152,11 @@
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:padding="12dp"
+                android:layout_marginBottom="0dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
                 android:layout_marginBottom="16dp" />
 
         </LinearLayout>

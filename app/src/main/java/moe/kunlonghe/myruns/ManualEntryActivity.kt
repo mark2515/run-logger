@@ -134,7 +134,7 @@ class ManualEntryActivity : AppCompatActivity(),
         }
 
         myRunsViewModel.insert(entry)
-        Toast.makeText(this, "MyRuns entry saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Entry saved", Toast.LENGTH_SHORT).show()
         finish()
     }
 
