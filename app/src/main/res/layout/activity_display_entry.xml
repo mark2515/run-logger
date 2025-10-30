@@ -2,7 +2,11 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false"
+    android:paddingTop="?attr/actionBarSize"
+    android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,20 +17,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Input Type:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_input_type"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Manual Entry"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -34,20 +36,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Activity:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_activity_type"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Running"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -55,20 +55,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Date/Time:"
+                android:text="Date and Time:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_date_time"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="22:10:50 Oct 30 2025"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -76,20 +74,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Duration:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_duration"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="30 mins"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -97,20 +93,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Distance:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_distance"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="5.0 Miles"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -118,20 +112,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Calories:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_calories"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="500 cals"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -139,24 +131,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:paddingVertical="8dp">
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Heart Rate:"
                 android:textStyle="bold"
                 android:textSize="16sp" />
             <TextView
                 android:id="@+id/tv_heart_rate"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="120 bpm"
                 android:textSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
-
