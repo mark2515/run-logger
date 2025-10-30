@@ -97,7 +97,7 @@ class DisplayEntryActivity : AppCompatActivity() {
         
         // Display duration
         tvDuration.text = if (entry.duration > 0) {
-            UnitConverter.formatDurationInMinutes(entry.duration)
+            UnitConverter.formatDurationFromSeconds(entry.duration)
         } else {
             "N/A"
         }

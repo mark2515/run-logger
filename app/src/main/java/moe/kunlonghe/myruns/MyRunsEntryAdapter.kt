@@ -34,7 +34,7 @@ class MyRunsEntryAdapter(
             }
             
             val duration = if (it.duration > 0) {
-                UnitConverter.formatDurationInMinutes(it.duration)
+                UnitConverter.formatDurationFromSeconds(it.duration)
             } else {
                 "0 secs"
             }

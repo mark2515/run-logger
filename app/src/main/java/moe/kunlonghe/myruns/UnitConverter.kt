@@ -14,7 +14,6 @@ object UnitConverter {
         return try {
             sharedPref.getBoolean("unit_preference", false)
         } catch (e: ClassCastException) {
-            // Fallback for legacy string-based value
             sharedPref.getString("unit_preference", "Imperial") == "Metric"
         }
     }
@@ -35,9 +34,18 @@ object UnitConverter {
         }
     }
 
-    fun formatDurationInMinutes(durationInSeconds: Double): String {
-        val minutes = (durationInSeconds / 60).toInt()
-        return "$minutes mins"
+    fun formatDurationFromMinutes(minutesInput: Double): String {
+        val totalSeconds = (minutesInput * 60.0).toInt()
+        val mins = totalSeconds / 60
+        val secs = totalSeconds % 60
+        return if (mins > 0) "$mins mins $secs secs" else "$secs secs"
+    }
+
+    fun formatDurationFromSeconds(durationInSeconds: Double): String {
+        val total = durationInSeconds.toInt()
+        val mins = total / 60
+        val secs = total % 60
+        return if (mins > 0) "$mins mins $secs secs" else "$secs secs"
     }
 
     fun formatCalories(calories: Double): String {

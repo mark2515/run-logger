@@ -265,8 +265,9 @@ class ManualEntryActivity : AppCompatActivity(),
     override fun onNumberSet(value: String) {
         when (currentNumberInputTag) {
             DURATION_DIALOG_TAG -> {
-                duration = value.toDoubleOrNull() ?: 0.0
-                textViewDuration.text = "$value mins"
+                val minutes = value.toDoubleOrNull() ?: 0.0
+                duration = minutes
+                textViewDuration.text = UnitConverter.formatDurationFromMinutes(minutes)
             }
             DISTANCE_DIALOG_TAG -> {
                 distance = value.toDoubleOrNull() ?: 0.0
