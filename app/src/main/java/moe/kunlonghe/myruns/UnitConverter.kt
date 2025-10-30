@@ -11,8 +11,12 @@ object UnitConverter {
 
     fun isMetric(context: Context): Boolean {
         val sharedPref = context.getSharedPreferences("MyRunsPrefs", Context.MODE_PRIVATE)
-        val unitPref = sharedPref.getString("unit_preference", "Imperial")
-        return unitPref == "Metric"
+        return try {
+            sharedPref.getBoolean("unit_preference", false)
+        } catch (e: ClassCastException) {
+            // Fallback for legacy string-based value
+            sharedPref.getString("unit_preference", "Imperial") == "Metric"
+        }
     }
 
     fun milesToKm(miles: Double): Double {
