@@ -34,6 +34,7 @@ class MyDialog : DialogFragment(), View.OnClickListener {
         const val SHARED_PREFS_NAME = "MyRunsPrefs"
         const val DIALOG_TITLE_KEY = "dialog_title"
         const val DIALOG_UNIT_KEY = "dialog_unit"
+        const val DIALOG_ALLOW_DECIMALS_KEY = "dialog_allow_decimals"
     }
 
     interface ProfilePhotoDialogListener {
@@ -105,10 +106,8 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 builder.setView(view)
                 builder.setTitle("my title")
                 builder.setPositiveButton("ok") { _, _ ->
-                    // Handle ok click
                 }
                 builder.setNegativeButton("cancel") { _, _ ->
-                    // Handle cancel click
                 }
                 ret = builder.create()
             }
@@ -138,17 +137,15 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 val radioImperial = view.findViewById<RadioButton>(R.id.radioImperial)
                 
                 val sharedPrefs = requireActivity().getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
-                val isMetric = try {
-                    sharedPrefs.getBoolean(UNIT_PREFERENCE_KEY, false)
-                } catch (e: ClassCastException) {
-                    sharedPrefs.getString(UNIT_PREFERENCE_KEY, "Imperial") == "Metric"
+                if (sharedPrefs.contains(UNIT_PREFERENCE_KEY)) {
+                    val isMetric = sharedPrefs.getBoolean(UNIT_PREFERENCE_KEY, false)
+                    if (isMetric) {
+                        radioMetric.isChecked = true
+                    } else {
+                        radioImperial.isChecked = true
+                    }
                 }
-                if (isMetric) {
-                    radioMetric.isChecked = true
-                } else {
-                    radioImperial.isChecked = true
-                }
-
+                
                 radioGroup.setOnCheckedChangeListener { _, checkedId ->
                     when (checkedId) {
                         R.id.radioMetric -> {
@@ -167,7 +164,6 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                 builder.setView(view)
                 builder.setTitle("Unit Preference")
                 builder.setNegativeButton("CANCEL") { _, _ ->
-                    // Handle cancel click
                 }
                 ret = builder.create()
             }
@@ -190,7 +186,6 @@ class MyDialog : DialogFragment(), View.OnClickListener {
                     commentsListener?.onCommentsUpdated(comments)
                 }
                 builder.setNegativeButton("CANCEL") { _, _ ->
-                    // Handle cancel click
                 }
                 ret = builder.create()
             }
@@ -244,9 +239,14 @@ class MyDialog : DialogFragment(), View.OnClickListener {
             NUMBER_INPUT_DIALOG -> {
                 val title = bundle?.getString(DIALOG_TITLE_KEY) ?: "Input"
                 val unit = bundle?.getString(DIALOG_UNIT_KEY) ?: ""
-                
+                val allowDecimals = bundle?.getBoolean(DIALOG_ALLOW_DECIMALS_KEY, true) ?: true
+
                 val editText = EditText(requireContext())
-                editText.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                editText.inputType = if (allowDecimals) {
+                    InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                } else {
+                    InputType.TYPE_CLASS_NUMBER
+                }
                 
                 val builder = AlertDialog.Builder(requireContext())
                     .setTitle(title)

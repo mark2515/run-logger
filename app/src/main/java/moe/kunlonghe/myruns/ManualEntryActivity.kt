@@ -30,20 +30,16 @@ class ManualEntryActivity : AppCompatActivity(),
     private var inputType: String? = null
     private var activityType: String? = null
 
-    // Calendar instance for date picker
     private val calendar = Calendar.getInstance()
 
-    // ViewModel for database operations
     private lateinit var myRunsViewModel: MyRunsViewModel
 
-    // Store current values
     private var duration: Double = 0.0
     private var distance: Double = 0.0
     private var calories: Double = 0.0
     private var heartRate: Double = 0.0
     private var comment: String = ""
 
-    // Track which number input dialog is active
     private var currentNumberInputTag: String? = null
 
     companion object {
@@ -60,20 +56,13 @@ class ManualEntryActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_manual_entry)
 
-        // Get data from intent
         inputType = intent.getStringExtra("INPUT_TYPE")
         activityType = intent.getStringExtra("ACTIVITY_TYPE")
 
-        // Initialize views
         initializeViews()
-
-        // Setup buttons
         setupButtons()
-
-        // Restore dialog listeners after configuration change
         restoreDialogListeners()
 
-        // Setup database and ViewModel
         val database = MyRunsDatabase.getInstance(applicationContext)
         val databaseDao = database.myRunsEntryDao
         val repository = MyRunsRepository(databaseDao)
@@ -84,31 +73,24 @@ class ManualEntryActivity : AppCompatActivity(),
     }
 
     private fun restoreDialogListeners() {
-        // Restore listeners for any existing dialogs
         supportFragmentManager.findFragmentByTag(DATE_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setDatePickerDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(TIME_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setTimePickerDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(DURATION_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setNumberInputDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(DISTANCE_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setNumberInputDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(CALORIES_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setNumberInputDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(HEART_RATE_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setNumberInputDialogListener(this)
         }
-
         supportFragmentManager.findFragmentByTag(COMMENTS_DIALOG_TAG)?.let { dialog ->
             (dialog as? MyDialog)?.setCommentsDialogListener(this)
         }
@@ -125,69 +107,39 @@ class ManualEntryActivity : AppCompatActivity(),
         buttonSave = findViewById(R.id.button_save)
         buttonCancel = findViewById(R.id.button_cancel)
 
-        textViewDate.setOnClickListener {
-            showDatePickerDialog()
-        }
-
-        textViewTime.setOnClickListener {
-            showTimePickerDialog()
-        }
-
-        textViewDuration.setOnClickListener {
-            showNumberInputDialog("Duration", "mins", DURATION_DIALOG_TAG)
-        }
-
-        textViewDistance.setOnClickListener {
-            showNumberInputDialog("Distance", "miles", DISTANCE_DIALOG_TAG)
-        }
-
-        textViewCalories.setOnClickListener {
-            showNumberInputDialog("Calories", "cals", CALORIES_DIALOG_TAG)
-        }
-
-        textViewHeartRate.setOnClickListener {
-            showNumberInputDialog("Heart Rate", "bpm", HEART_RATE_DIALOG_TAG)
-        }
-
-        textViewComment.setOnClickListener {
-            showCommentsDialog()
-        }
+        textViewDate.setOnClickListener { showDatePickerDialog() }
+        textViewTime.setOnClickListener { showTimePickerDialog() }
+        textViewDuration.setOnClickListener { showNumberInputDialog("Duration", "mins", DURATION_DIALOG_TAG) }
+        textViewDistance.setOnClickListener { showNumberInputDialog("Distance", "miles", DISTANCE_DIALOG_TAG) }
+        textViewCalories.setOnClickListener { showNumberInputDialog("Calories", "cals", CALORIES_DIALOG_TAG) }
+        textViewHeartRate.setOnClickListener { showNumberInputDialog("Heart Rate", "bpm", HEART_RATE_DIALOG_TAG) }
+        textViewComment.setOnClickListener { showCommentsDialog() }
     }
 
     private fun setupButtons() {
-        buttonSave.setOnClickListener {
-            saveMyRunsEntry()
-        }
-
-        buttonCancel.setOnClickListener {
-            finish()
-        }
+        buttonSave.setOnClickListener { saveMyRunsEntry() }
+        buttonCancel.setOnClickListener { finish() }
     }
 
     private fun saveMyRunsEntry() {
-        // Create myruns entry
         val entry = MyRunsEntry().apply {
             this.inputType = UnitConverter.getInputTypeInt(this@ManualEntryActivity.inputType ?: "Manual Entry")
             this.activityType = UnitConverter.getActivityTypeInt(this@ManualEntryActivity.activityType ?: "Running")
             this.dateTime = calendar.timeInMillis
-            this.duration = this@ManualEntryActivity.duration * 60 // Convert minutes to seconds
-            this.distance = this@ManualEntryActivity.distance // Already in miles
+            this.duration = this@ManualEntryActivity.duration * 60
+            this.distance = this@ManualEntryActivity.distance
             this.calorie = this@ManualEntryActivity.calories
             this.heartRate = this@ManualEntryActivity.heartRate
             this.comment = this@ManualEntryActivity.comment
         }
 
-        // Insert into database
         myRunsViewModel.insert(entry)
-
         Toast.makeText(this, "MyRuns entry saved", Toast.LENGTH_SHORT).show()
         finish()
     }
 
     private fun showDatePickerDialog() {
-        if (supportFragmentManager.findFragmentByTag(DATE_DIALOG_TAG) != null) {
-            return
-        }
+        if (supportFragmentManager.findFragmentByTag(DATE_DIALOG_TAG) != null) return
 
         val dialog = MyDialog()
         val bundle = Bundle()
@@ -198,9 +150,7 @@ class ManualEntryActivity : AppCompatActivity(),
     }
 
     private fun showTimePickerDialog() {
-        if (supportFragmentManager.findFragmentByTag(TIME_DIALOG_TAG) != null) {
-            return
-        }
+        if (supportFragmentManager.findFragmentByTag(TIME_DIALOG_TAG) != null) return
 
         val dialog = MyDialog()
         val bundle = Bundle()
@@ -221,15 +171,15 @@ class ManualEntryActivity : AppCompatActivity(),
         bundle.putInt(MyDialog.DIALOG_KEY, MyDialog.NUMBER_INPUT_DIALOG)
         bundle.putString(MyDialog.DIALOG_TITLE_KEY, title)
         bundle.putString(MyDialog.DIALOG_UNIT_KEY, unit)
+        val allowDecimals = tag != CALORIES_DIALOG_TAG && tag != HEART_RATE_DIALOG_TAG
+        bundle.putBoolean(MyDialog.DIALOG_ALLOW_DECIMALS_KEY, allowDecimals)
         dialog.arguments = bundle
         dialog.setNumberInputDialogListener(this)
         dialog.show(supportFragmentManager, tag)
     }
 
     private fun showCommentsDialog() {
-        if (supportFragmentManager.findFragmentByTag(COMMENTS_DIALOG_TAG) != null) {
-            return
-        }
+        if (supportFragmentManager.findFragmentByTag(COMMENTS_DIALOG_TAG) != null) return
 
         val dialog = MyDialog()
         val bundle = Bundle()
@@ -274,12 +224,14 @@ class ManualEntryActivity : AppCompatActivity(),
                 textViewDistance.text = "$value miles"
             }
             CALORIES_DIALOG_TAG -> {
-                calories = value.toDoubleOrNull() ?: 0.0
-                textViewCalories.text = "$value cals"
+                val intVal = value.toIntOrNull() ?: 0
+                calories = intVal.toDouble()
+                textViewCalories.text = UnitConverter.formatCalories(calories)
             }
             HEART_RATE_DIALOG_TAG -> {
-                heartRate = value.toDoubleOrNull() ?: 0.0
-                textViewHeartRate.text = "$value bpm"
+                val intVal = value.toIntOrNull() ?: 0
+                heartRate = intVal.toDouble()
+                textViewHeartRate.text = UnitConverter.formatHeartRate(heartRate)
             }
         }
         currentNumberInputTag = null
