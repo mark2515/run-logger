@@ -69,7 +69,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Oct 30, 2025 2:00 PM"
+                android:text="22:10:50 Oct 30 2025"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -155,27 +155,6 @@
                 android:layout_weight="1"
                 android:text="120 bpm"
                 android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingVertical="8dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Comment:"
-                android:textStyle="bold"
-                android:textSize="16sp" />
-            <TextView
-                android:id="@+id/tv_comment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text=""
-                android:textSize="16sp"
-                android:minHeight="48dp" />
         </LinearLayout>
 
     </LinearLayout>

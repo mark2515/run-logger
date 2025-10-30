@@ -21,7 +21,6 @@ class DisplayEntryActivity : AppCompatActivity() {
     private lateinit var tvDistance: TextView
     private lateinit var tvCalories: TextView
     private lateinit var tvHeartRate: TextView
-    private lateinit var tvComment: TextView
     
     private lateinit var myRunsViewModel: MyRunsViewModel
     private var entryId: Long = -1
@@ -65,7 +64,6 @@ class DisplayEntryActivity : AppCompatActivity() {
         tvDistance = findViewById(R.id.tv_distance)
         tvCalories = findViewById(R.id.tv_calories)
         tvHeartRate = findViewById(R.id.tv_heart_rate)
-        tvComment = findViewById(R.id.tv_comment)
     }
     
     private fun loadEntryData() {
@@ -96,39 +94,20 @@ class DisplayEntryActivity : AppCompatActivity() {
         tvDateTime.text = UnitConverter.formatDateTime(entry.dateTime)
         
         // Display duration
-        tvDuration.text = if (entry.duration > 0) {
-            UnitConverter.formatDurationFromSeconds(entry.duration)
-        } else {
-            "N/A"
-        }
+        val durationValue = if (entry.duration > 0) entry.duration else 0.0
+        tvDuration.text = UnitConverter.formatDurationFromSeconds(durationValue)
         
         // Display distance
-        tvDistance.text = if (entry.distance > 0) {
-            UnitConverter.formatDistance(this, entry.distance)
-        } else {
-            "N/A"
-        }
+        val distanceValue = if (entry.distance > 0) entry.distance else 0.0
+        tvDistance.text = UnitConverter.formatDistance(this, distanceValue)
         
         // Display calories
-        tvCalories.text = if (entry.calorie > 0) {
-            UnitConverter.formatCalories(entry.calorie)
-        } else {
-            "N/A"
-        }
+        val caloriesValue = if (entry.calorie > 0) entry.calorie else 0.0
+        tvCalories.text = UnitConverter.formatCalories(caloriesValue)
         
         // Display heart rate
-        tvHeartRate.text = if (entry.heartRate > 0) {
-            UnitConverter.formatHeartRate(entry.heartRate)
-        } else {
-            "N/A"
-        }
-        
-        // Display comment
-        tvComment.text = if (entry.comment.isNotEmpty()) {
-            entry.comment
-        } else {
-            "No comment"
-        }
+        val heartRateValue = if (entry.heartRate > 0) entry.heartRate else 0.0
+        tvHeartRate.text = UnitConverter.formatHeartRate(heartRateValue)
     }
     
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

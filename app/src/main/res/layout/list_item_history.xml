@@ -12,7 +12,7 @@
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:text="Running, 10/30/2025 2:00 PM" />
+        android:text="Running, 22:10:50 Oct 30 2025" />
 
     <TextView
         android:id="@+id/textview_details"
@@ -21,7 +21,6 @@
         android:layout_marginTop="4dp"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
-        android:text="Distance: 5.0 Miles, Duration: 30 mins" />
+        android:text="Distance: 0 Miles, Duration: 0 secs" />
 
 </LinearLayout>
-

@@ -27,18 +27,12 @@ class MyRunsEntryAdapter(
             val dateTime = UnitConverter.formatDateTime(it.dateTime)
             titleTextView.text = "Manual Entry: $activityName, $dateTime"
 
-            val distance = if (it.distance > 0) {
-                UnitConverter.formatDistance(context, it.distance)
-            } else {
-                "0 Miles"
-            }
-            
-            val duration = if (it.duration > 0) {
-                UnitConverter.formatDurationFromSeconds(it.duration)
-            } else {
-                "0 secs"
-            }
-            
+            val distanceValue = if (it.distance > 0) it.distance else 0.0
+            val distance = UnitConverter.formatDistance(context, distanceValue)
+
+            val durationValue = if (it.duration > 0) it.duration else 0.0
+            val duration = UnitConverter.formatDurationFromSeconds(durationValue)
+
             detailsTextView.text = "$distance, $duration"
         }
 
