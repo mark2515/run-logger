@@ -4,12 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 
-class ExerciseViewModel(private val repository: ExerciseRepository) : ViewModel() {
+class MyRunsViewModel(private val repository: MyRunsRepository) : ViewModel() {
 
-    val allExerciseEntriesLiveData: LiveData<List<ExerciseEntry>> = 
-        repository.allExerciseEntries.asLiveData()
+    val allMyRunsEntriesLiveData: LiveData<List<MyRunsEntry>> = 
+        repository.allMyRunsEntries.asLiveData()
 
-    fun insert(entry: ExerciseEntry) {
+    fun insert(entry: MyRunsEntry) {
         repository.insert(entry)
     }
 

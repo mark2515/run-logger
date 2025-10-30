@@ -34,7 +34,7 @@ class ManualEntryActivity : AppCompatActivity(),
     private val calendar = Calendar.getInstance()
     
     // ViewModel for database operations
-    private lateinit var exerciseViewModel: ExerciseViewModel
+    private lateinit var myRunsViewModel: MyRunsViewModel
     
     // Store current values
     private var duration: Double = 0.0
@@ -71,11 +71,11 @@ class ManualEntryActivity : AppCompatActivity(),
         restoreDialogListeners()
         
         // Setup database and ViewModel
-        val database = ExerciseDatabase.getInstance(applicationContext)
-        val databaseDao = database.exerciseEntryDao
-        val repository = ExerciseRepository(databaseDao)
-        val viewModelFactory = ExerciseViewModelFactory(repository)
-        exerciseViewModel = ViewModelProvider(this, viewModelFactory).get(ExerciseViewModel::class.java)
+        val database = MyRunsDatabase.getInstance(applicationContext)
+        val databaseDao = database.myRunsEntryDao
+        val repository = MyRunsRepository(databaseDao)
+        val viewModelFactory = MyRunsViewModelFactory(repository)
+        myRunsViewModel = ViewModelProvider(this, viewModelFactory).get(MyRunsViewModel::class.java)
         
         supportActionBar?.title = "Manual Entry"
     }
@@ -153,7 +153,7 @@ class ManualEntryActivity : AppCompatActivity(),
     
     private fun setupButtons() {
         buttonSave.setOnClickListener {
-            saveExerciseEntry()
+            saveMyRunsEntry()
         }
         
         buttonCancel.setOnClickListener {
@@ -161,9 +161,9 @@ class ManualEntryActivity : AppCompatActivity(),
         }
     }
     
-    private fun saveExerciseEntry() {
-        // Create exercise entry
-        val entry = ExerciseEntry().apply {
+    private fun saveMyRunsEntry() {
+        // Create myruns entry
+        val entry = MyRunsEntry().apply {
             this.inputType = UnitConverter.getInputTypeInt(this@ManualEntryActivity.inputType ?: "Manual Entry")
             this.activityType = UnitConverter.getActivityTypeInt(this@ManualEntryActivity.activityType ?: "Running")
             this.dateTime = calendar.timeInMillis
@@ -175,9 +175,9 @@ class ManualEntryActivity : AppCompatActivity(),
         }
         
         // Insert into database
-        exerciseViewModel.insert(entry)
+        myRunsViewModel.insert(entry)
         
-        Toast.makeText(this, "Exercise entry saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "MyRuns entry saved", Toast.LENGTH_SHORT).show()
         finish()
     }
     

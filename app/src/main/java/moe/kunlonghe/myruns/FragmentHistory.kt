@@ -14,8 +14,8 @@ import moe.kunlonghe.myruns.database.*
 class FragmentHistory : Fragment() {
     
     private lateinit var listView: ListView
-    private lateinit var adapter: ExerciseEntryAdapter
-    private lateinit var exerciseViewModel: ExerciseViewModel
+    private lateinit var adapter: MyRunsEntryAdapter
+    private lateinit var myRunsViewModel: MyRunsViewModel
     
     override fun onCreateView(
         inflater: LayoutInflater, 
@@ -28,7 +28,7 @@ class FragmentHistory : Fragment() {
         listView = view.findViewById(R.id.listview_history)
         
         // Initialize adapter with empty list
-        adapter = ExerciseEntryAdapter(requireContext(), emptyList())
+        adapter = MyRunsEntryAdapter(requireContext(), emptyList())
         listView.adapter = adapter
         
         // Setup item click listener
@@ -48,17 +48,17 @@ class FragmentHistory : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // Setup database and ViewModel
-        val database = ExerciseDatabase.getInstance(requireActivity().applicationContext)
-        val databaseDao = database.exerciseEntryDao
-        val repository = ExerciseRepository(databaseDao)
-        val viewModelFactory = ExerciseViewModelFactory(repository)
-        exerciseViewModel = ViewModelProvider(
+        val database = MyRunsDatabase.getInstance(requireActivity().applicationContext)
+        val databaseDao = database.myRunsEntryDao
+        val repository = MyRunsRepository(databaseDao)
+        val viewModelFactory = MyRunsViewModelFactory(repository)
+        myRunsViewModel = ViewModelProvider(
             requireActivity(), 
             viewModelFactory
-        ).get(ExerciseViewModel::class.java)
+        ).get(MyRunsViewModel::class.java)
         
         // Observe database changes
-        exerciseViewModel.allExerciseEntriesLiveData.observe(viewLifecycleOwner) { entries ->
+        myRunsViewModel.allMyRunsEntriesLiveData.observe(viewLifecycleOwner) { entries ->
             if (entries != null) {
                 adapter.replace(entries)
                 adapter.notifyDataSetChanged()
@@ -69,7 +69,7 @@ class FragmentHistory : Fragment() {
     override fun onResume() {
         super.onResume()
         // Trigger a refresh when fragment becomes visible
-        exerciseViewModel.allExerciseEntriesLiveData.value?.let { entries ->
+        myRunsViewModel.allMyRunsEntriesLiveData.value?.let { entries ->
             adapter.replace(entries)
             adapter.notifyDataSetChanged()
         }

@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Kunlong_He_MyRuns2"
+rootProject.name = "Kunlong_He_MyRuns3"
 include(":app")

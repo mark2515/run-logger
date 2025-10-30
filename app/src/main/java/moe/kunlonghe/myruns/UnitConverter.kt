@@ -1,14 +1,13 @@
 package moe.kunlonghe.myruns
 
 import android.content.Context
-import moe.kunlonghe.myruns.database.ExerciseEntry
+import moe.kunlonghe.myruns.database.MyRunsEntry
 import java.text.SimpleDateFormat
 import java.util.*
 
 object UnitConverter {
     // Conversion constants
     private const val MILES_TO_KM = 1.60934
-    private const val FEET_TO_METERS = 0.3048
 
     fun isMetric(context: Context): Boolean {
         val sharedPref = context.getSharedPreferences("MyRunsPrefs", Context.MODE_PRIVATE)
@@ -24,48 +23,11 @@ object UnitConverter {
         return km / MILES_TO_KM
     }
 
-    fun feetToMeters(feet: Double): Double {
-        return feet * FEET_TO_METERS
-    }
-
-    fun metersToFeet(meters: Double): Double {
-        return meters / FEET_TO_METERS
-    }
-
     fun formatDistance(context: Context, distanceInMiles: Double): String {
         return if (isMetric(context)) {
             String.format("%.2f Kilometers", milesToKm(distanceInMiles))
         } else {
             String.format("%.2f Miles", distanceInMiles)
-        }
-    }
-
-    fun formatClimb(context: Context, climbInFeet: Double): String {
-        return if (isMetric(context)) {
-            String.format("%.2f Meters", feetToMeters(climbInFeet))
-        } else {
-            String.format("%.2f Feet", climbInFeet)
-        }
-    }
-
-    fun formatSpeed(context: Context, speedInMph: Double): String {
-        return if (isMetric(context)) {
-            String.format("%.2f km/h", milesToKm(speedInMph))
-        } else {
-            String.format("%.2f mph", speedInMph)
-        }
-    }
-
-    fun formatPace(context: Context, paceInMinPerMile: Double): String {
-        return if (isMetric(context)) {
-            val paceInMinPerKm = paceInMinPerMile / MILES_TO_KM
-            val minutes = paceInMinPerKm.toInt()
-            val seconds = ((paceInMinPerKm - minutes) * 60).toInt()
-            String.format("%d:%02d min/km", minutes, seconds)
-        } else {
-            val minutes = paceInMinPerMile.toInt()
-            val seconds = ((paceInMinPerMile - minutes) * 60).toInt()
-            String.format("%d:%02d min/mile", minutes, seconds)
         }
     }
 
@@ -116,60 +78,59 @@ object UnitConverter {
 
     fun getActivityTypeName(activityType: Int): String {
         return when (activityType) {
-            ExerciseEntry.ACTIVITY_TYPE_RUNNING -> "Running"
-            ExerciseEntry.ACTIVITY_TYPE_WALKING -> "Walking"
-            ExerciseEntry.ACTIVITY_TYPE_STANDING -> "Standing"
-            ExerciseEntry.ACTIVITY_TYPE_CYCLING -> "Cycling"
-            ExerciseEntry.ACTIVITY_TYPE_HIKING -> "Hiking"
-            ExerciseEntry.ACTIVITY_TYPE_DOWNHILL_SKIING -> "Downhill Skiing"
-            ExerciseEntry.ACTIVITY_TYPE_CROSS_COUNTRY_SKIING -> "Cross-Country Skiing"
-            ExerciseEntry.ACTIVITY_TYPE_SNOWBOARDING -> "Snowboarding"
-            ExerciseEntry.ACTIVITY_TYPE_SKATING -> "Skating"
-            ExerciseEntry.ACTIVITY_TYPE_SWIMMING -> "Swimming"
-            ExerciseEntry.ACTIVITY_TYPE_MOUNTAIN_BIKING -> "Mountain Biking"
-            ExerciseEntry.ACTIVITY_TYPE_WHEELCHAIR -> "Wheelchair"
-            ExerciseEntry.ACTIVITY_TYPE_ELLIPTICAL -> "Elliptical"
-            ExerciseEntry.ACTIVITY_TYPE_OTHER -> "Other"
+            MyRunsEntry.ACTIVITY_TYPE_RUNNING -> "Running"
+            MyRunsEntry.ACTIVITY_TYPE_WALKING -> "Walking"
+            MyRunsEntry.ACTIVITY_TYPE_STANDING -> "Standing"
+            MyRunsEntry.ACTIVITY_TYPE_CYCLING -> "Cycling"
+            MyRunsEntry.ACTIVITY_TYPE_HIKING -> "Hiking"
+            MyRunsEntry.ACTIVITY_TYPE_DOWNHILL_SKIING -> "Downhill Skiing"
+            MyRunsEntry.ACTIVITY_TYPE_CROSS_COUNTRY_SKIING -> "Cross-Country Skiing"
+            MyRunsEntry.ACTIVITY_TYPE_SNOWBOARDING -> "Snowboarding"
+            MyRunsEntry.ACTIVITY_TYPE_SKATING -> "Skating"
+            MyRunsEntry.ACTIVITY_TYPE_SWIMMING -> "Swimming"
+            MyRunsEntry.ACTIVITY_TYPE_MOUNTAIN_BIKING -> "Mountain Biking"
+            MyRunsEntry.ACTIVITY_TYPE_WHEELCHAIR -> "Wheelchair"
+            MyRunsEntry.ACTIVITY_TYPE_ELLIPTICAL -> "Elliptical"
+            MyRunsEntry.ACTIVITY_TYPE_OTHER -> "Other"
             else -> "Unknown"
         }
     }
 
     fun getInputTypeName(inputType: Int): String {
         return when (inputType) {
-            ExerciseEntry.INPUT_TYPE_MANUAL -> "Manual Entry"
-            ExerciseEntry.INPUT_TYPE_GPS -> "GPS"
-            ExerciseEntry.INPUT_TYPE_AUTOMATIC -> "Automatic"
+            MyRunsEntry.INPUT_TYPE_MANUAL -> "Manual Entry"
+            MyRunsEntry.INPUT_TYPE_GPS -> "GPS"
+            MyRunsEntry.INPUT_TYPE_AUTOMATIC -> "Automatic"
             else -> "Unknown"
         }
     }
 
     fun getActivityTypeInt(activityTypeName: String): Int {
         return when (activityTypeName) {
-            "Running" -> ExerciseEntry.ACTIVITY_TYPE_RUNNING
-            "Walking" -> ExerciseEntry.ACTIVITY_TYPE_WALKING
-            "Standing" -> ExerciseEntry.ACTIVITY_TYPE_STANDING
-            "Cycling" -> ExerciseEntry.ACTIVITY_TYPE_CYCLING
-            "Hiking" -> ExerciseEntry.ACTIVITY_TYPE_HIKING
-            "Downhill Skiing" -> ExerciseEntry.ACTIVITY_TYPE_DOWNHILL_SKIING
-            "Cross-Country Skiing" -> ExerciseEntry.ACTIVITY_TYPE_CROSS_COUNTRY_SKIING
-            "Snowboarding" -> ExerciseEntry.ACTIVITY_TYPE_SNOWBOARDING
-            "Skating" -> ExerciseEntry.ACTIVITY_TYPE_SKATING
-            "Swimming" -> ExerciseEntry.ACTIVITY_TYPE_SWIMMING
-            "Mountain Biking" -> ExerciseEntry.ACTIVITY_TYPE_MOUNTAIN_BIKING
-            "Wheelchair" -> ExerciseEntry.ACTIVITY_TYPE_WHEELCHAIR
-            "Elliptical" -> ExerciseEntry.ACTIVITY_TYPE_ELLIPTICAL
-            "Other" -> ExerciseEntry.ACTIVITY_TYPE_OTHER
-            else -> ExerciseEntry.ACTIVITY_TYPE_RUNNING
+            "Running" -> MyRunsEntry.ACTIVITY_TYPE_RUNNING
+            "Walking" -> MyRunsEntry.ACTIVITY_TYPE_WALKING
+            "Standing" -> MyRunsEntry.ACTIVITY_TYPE_STANDING
+            "Cycling" -> MyRunsEntry.ACTIVITY_TYPE_CYCLING
+            "Hiking" -> MyRunsEntry.ACTIVITY_TYPE_HIKING
+            "Downhill Skiing" -> MyRunsEntry.ACTIVITY_TYPE_DOWNHILL_SKIING
+            "Cross-Country Skiing" -> MyRunsEntry.ACTIVITY_TYPE_CROSS_COUNTRY_SKIING
+            "Snowboarding" -> MyRunsEntry.ACTIVITY_TYPE_SNOWBOARDING
+            "Skating" -> MyRunsEntry.ACTIVITY_TYPE_SKATING
+            "Swimming" -> MyRunsEntry.ACTIVITY_TYPE_SWIMMING
+            "Mountain Biking" -> MyRunsEntry.ACTIVITY_TYPE_MOUNTAIN_BIKING
+            "Wheelchair" -> MyRunsEntry.ACTIVITY_TYPE_WHEELCHAIR
+            "Elliptical" -> MyRunsEntry.ACTIVITY_TYPE_ELLIPTICAL
+            "Other" -> MyRunsEntry.ACTIVITY_TYPE_OTHER
+            else -> MyRunsEntry.ACTIVITY_TYPE_RUNNING
         }
     }
 
     fun getInputTypeInt(inputTypeName: String): Int {
         return when (inputTypeName) {
-            "Manual Entry" -> ExerciseEntry.INPUT_TYPE_MANUAL
-            "GPS" -> ExerciseEntry.INPUT_TYPE_GPS
-            "Automatic" -> ExerciseEntry.INPUT_TYPE_AUTOMATIC
-            else -> ExerciseEntry.INPUT_TYPE_MANUAL
+            "Manual Entry" -> MyRunsEntry.INPUT_TYPE_MANUAL
+            "GPS" -> MyRunsEntry.INPUT_TYPE_GPS
+            "Automatic" -> MyRunsEntry.INPUT_TYPE_AUTOMATIC
+            else -> MyRunsEntry.INPUT_TYPE_MANUAL
         }
     }
 }
-

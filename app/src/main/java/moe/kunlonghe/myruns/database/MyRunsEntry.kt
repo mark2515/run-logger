@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
 
-@Entity(tableName = "exercise_table")
-data class ExerciseEntry(
+@Entity(tableName = "myruns_table")
+data class MyRunsEntry(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0L,
 
@@ -24,17 +24,8 @@ data class ExerciseEntry(
     @ColumnInfo(name = "distance")
     var distance: Double = 0.0,
 
-    @ColumnInfo(name = "avg_pace")
-    var avgPace: Double = 0.0,
-
-    @ColumnInfo(name = "avg_speed")
-    var avgSpeed: Double = 0.0,
-
     @ColumnInfo(name = "calorie")
     var calorie: Double = 0.0,
-
-    @ColumnInfo(name = "climb")
-    var climb: Double = 0.0,
 
     @ColumnInfo(name = "heart_rate")
     var heartRate: Double = 0.0,
@@ -68,3 +59,4 @@ data class ExerciseEntry(
         const val ACTIVITY_TYPE_OTHER = 13
     }
 }
+

@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import moe.kunlonghe.myruns.database.ExerciseEntry
+import moe.kunlonghe.myruns.database.MyRunsEntry
 
-class ExerciseEntryAdapter(
+class MyRunsEntryAdapter(
     context: Context,
-    private var entries: List<ExerciseEntry>
-) : ArrayAdapter<ExerciseEntry>(context, 0, entries) {
+    private var entries: List<MyRunsEntry>
+) : ArrayAdapter<MyRunsEntry>(context, 0, entries) {
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val entry = getItem(position)
@@ -49,11 +49,11 @@ class ExerciseEntryAdapter(
         return entries.size
     }
 
-    override fun getItem(position: Int): ExerciseEntry? {
+    override fun getItem(position: Int): MyRunsEntry? {
         return entries[position]
     }
 
-    fun replace(newEntries: List<ExerciseEntry>) {
+    fun replace(newEntries: List<MyRunsEntry>) {
         entries = newEntries
         notifyDataSetChanged()
     }

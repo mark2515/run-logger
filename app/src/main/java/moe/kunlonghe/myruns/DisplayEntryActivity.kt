@@ -23,9 +23,9 @@ class DisplayEntryActivity : AppCompatActivity() {
     private lateinit var tvHeartRate: TextView
     private lateinit var tvComment: TextView
     
-    private lateinit var exerciseViewModel: ExerciseViewModel
+    private lateinit var myRunsViewModel: MyRunsViewModel
     private var entryId: Long = -1
-    private var currentEntry: ExerciseEntry? = null
+    private var currentEntry: MyRunsEntry? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,11 +47,11 @@ class DisplayEntryActivity : AppCompatActivity() {
         initializeViews()
         
         // Setup database and ViewModel
-        val database = ExerciseDatabase.getInstance(applicationContext)
-        val databaseDao = database.exerciseEntryDao
-        val repository = ExerciseRepository(databaseDao)
-        val viewModelFactory = ExerciseViewModelFactory(repository)
-        exerciseViewModel = ViewModelProvider(this, viewModelFactory).get(ExerciseViewModel::class.java)
+        val database = MyRunsDatabase.getInstance(applicationContext)
+        val databaseDao = database.myRunsEntryDao
+        val repository = MyRunsRepository(databaseDao)
+        val viewModelFactory = MyRunsViewModelFactory(repository)
+        myRunsViewModel = ViewModelProvider(this, viewModelFactory).get(MyRunsViewModel::class.java)
         
         // Load entry data
         loadEntryData()
@@ -71,9 +71,9 @@ class DisplayEntryActivity : AppCompatActivity() {
     private fun loadEntryData() {
         lifecycleScope.launch {
             val entry = withContext(Dispatchers.IO) {
-                val database = ExerciseDatabase.getInstance(this@DisplayEntryActivity.applicationContext)
-                val dao = database.exerciseEntryDao
-                dao.getExerciseEntry(entryId)
+                val database = MyRunsDatabase.getInstance(this@DisplayEntryActivity.applicationContext)
+                val dao = database.myRunsEntryDao
+                dao.getMyRunsEntry(entryId)
             }
             
             if (entry != null) {
@@ -90,7 +90,7 @@ class DisplayEntryActivity : AppCompatActivity() {
         }
     }
     
-    private fun displayEntry(entry: ExerciseEntry) {
+    private fun displayEntry(entry: MyRunsEntry) {
         tvInputType.text = UnitConverter.getInputTypeName(entry.inputType)
         tvActivityType.text = UnitConverter.getActivityTypeName(entry.activityType)
         tvDateTime.text = UnitConverter.formatDateTime(entry.dateTime)
@@ -152,7 +152,7 @@ class DisplayEntryActivity : AppCompatActivity() {
     
     private fun deleteEntry() {
         if (entryId != -1L) {
-            exerciseViewModel.delete(entryId)
+            myRunsViewModel.delete(entryId)
             Toast.makeText(this, "Entry deleted", Toast.LENGTH_SHORT).show()
             finish()
         }
