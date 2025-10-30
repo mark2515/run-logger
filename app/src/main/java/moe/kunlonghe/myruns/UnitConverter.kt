@@ -31,20 +31,6 @@ object UnitConverter {
         }
     }
 
-    fun formatDuration(durationInSeconds: Double): String {
-        val hours = (durationInSeconds / 3600).toInt()
-        val minutes = ((durationInSeconds % 3600) / 60).toInt()
-        val seconds = (durationInSeconds % 60).toInt()
-        
-        return if (hours > 0) {
-            String.format("%dh %dm %ds", hours, minutes, seconds)
-        } else if (minutes > 0) {
-            String.format("%dm %ds", minutes, seconds)
-        } else {
-            String.format("%ds", seconds)
-        }
-    }
-
     fun formatDurationInMinutes(durationInSeconds: Double): String {
         val minutes = (durationInSeconds / 60).toInt()
         return "$minutes mins"
@@ -60,7 +46,7 @@ object UnitConverter {
 
     fun formatDateTime(timestamp: Long): String {
         val date = Date(timestamp)
-        val format = SimpleDateFormat("MMM dd yyyy, h:mm a", Locale.getDefault())
+        val format = SimpleDateFormat("HH:mm:ss MMM dd yyyy", Locale.ENGLISH)
         return format.format(date)
     }
 
