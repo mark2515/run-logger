@@ -7,6 +7,8 @@ import android.text.InputType
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import moe.kunlonghe.myruns.database.*
 import java.util.*
 
 class ManualEntryActivity : AppCompatActivity(), 
@@ -30,6 +32,16 @@ class ManualEntryActivity : AppCompatActivity(),
     
     // Calendar instance for date picker
     private val calendar = Calendar.getInstance()
+    
+    // ViewModel for database operations
+    private lateinit var exerciseViewModel: ExerciseViewModel
+    
+    // Store current values
+    private var duration: Double = 0.0
+    private var distance: Double = 0.0
+    private var calories: Double = 0.0
+    private var heartRate: Double = 0.0
+    private var comment: String = ""
     
     companion object {
         private const val DATE_DIALOG_TAG = "date_dialog"
@@ -57,6 +69,13 @@ class ManualEntryActivity : AppCompatActivity(),
         
         // Restore dialog listeners after configuration change
         restoreDialogListeners()
+        
+        // Setup database and ViewModel
+        val database = ExerciseDatabase.getInstance(applicationContext)
+        val databaseDao = database.exerciseEntryDao
+        val repository = ExerciseRepository(databaseDao)
+        val viewModelFactory = ExerciseViewModelFactory(repository)
+        exerciseViewModel = ViewModelProvider(this, viewModelFactory).get(ExerciseViewModel::class.java)
         
         supportActionBar?.title = "Manual Entry"
     }
@@ -134,12 +153,32 @@ class ManualEntryActivity : AppCompatActivity(),
     
     private fun setupButtons() {
         buttonSave.setOnClickListener {
-            finish()
+            saveExerciseEntry()
         }
         
         buttonCancel.setOnClickListener {
             finish()
         }
+    }
+    
+    private fun saveExerciseEntry() {
+        // Create exercise entry
+        val entry = ExerciseEntry().apply {
+            this.inputType = UnitConverter.getInputTypeInt(this@ManualEntryActivity.inputType ?: "Manual Entry")
+            this.activityType = UnitConverter.getActivityTypeInt(this@ManualEntryActivity.activityType ?: "Running")
+            this.dateTime = calendar.timeInMillis
+            this.duration = this@ManualEntryActivity.duration * 60 // Convert minutes to seconds
+            this.distance = this@ManualEntryActivity.distance // Already in miles
+            this.calorie = this@ManualEntryActivity.calories
+            this.heartRate = this@ManualEntryActivity.heartRate
+            this.comment = this@ManualEntryActivity.comment
+        }
+        
+        // Insert into database
+        exerciseViewModel.insert(entry)
+        
+        Toast.makeText(this, "Exercise entry saved", Toast.LENGTH_SHORT).show()
+        finish()
     }
     
     private fun showDatePickerDialog() {
@@ -197,17 +236,26 @@ class ManualEntryActivity : AppCompatActivity(),
     }
 
     override fun onCommentsUpdated(comments: String) {
+        comment = comments
+        textViewComment.text = if (comments.isNotEmpty()) comments else ""
     }
     
     override fun onDateSet(year: Int, month: Int, dayOfMonth: Int) {
         calendar.set(Calendar.YEAR, year)
         calendar.set(Calendar.MONTH, month)
         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+        updateDateTimeDisplay()
     }
     
     override fun onTimeSet(hourOfDay: Int, minute: Int) {
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
         calendar.set(Calendar.MINUTE, minute)
+        updateDateTimeDisplay()
+    }
+    
+    private fun updateDateTimeDisplay() {
+        textViewDate.text = UnitConverter.formatDate(calendar.timeInMillis)
+        textViewTime.text = UnitConverter.formatTime(calendar.timeInMillis)
     }
     
     override fun onNumberSet(value: String) {
@@ -219,15 +267,19 @@ class ManualEntryActivity : AppCompatActivity(),
             val tag = supportFragmentManager.fragments.find { it == dialog }?.tag
             when (tag) {
                 DURATION_DIALOG_TAG -> {
+                    duration = value.toDoubleOrNull() ?: 0.0
                     textViewDuration.text = "$value mins"
                 }
                 DISTANCE_DIALOG_TAG -> {
+                    distance = value.toDoubleOrNull() ?: 0.0
                     textViewDistance.text = "$value miles"
                 }
                 CALORIES_DIALOG_TAG -> {
+                    calories = value.toDoubleOrNull() ?: 0.0
                     textViewCalories.text = "$value cals"
                 }
                 HEART_RATE_DIALOG_TAG -> {
+                    heartRate = value.toDoubleOrNull() ?: 0.0
                     textViewHeartRate.text = "$value bpm"
                 }
             }
