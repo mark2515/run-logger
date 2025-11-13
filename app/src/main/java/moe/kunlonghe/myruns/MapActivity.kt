@@ -64,6 +64,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var startMarker: Marker? = null
     private var endMarker: Marker? = null
     private var polyline: Polyline? = null
+		private var hasCenteredCamera: Boolean = false
     
     private lateinit var myRunsViewModel: MyRunsViewModel
     
@@ -319,10 +320,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     
     override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        
-        // Do not enable My Location layer to avoid showing blue dot and accuracy circle
-        
+        googleMap = map        
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
         map.uiSettings.isZoomControlsEnabled = false
     }
@@ -362,7 +360,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             
             polyline = map.addPolyline(polylineOptions)
             
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(endLatLng, 15f))
+			if (!hasCenteredCamera) {
+				map.animateCamera(CameraUpdateFactory.newLatLngZoom(endLatLng, 15f))
+				hasCenteredCamera = true
+			} else {
+				val currentZoom = map.cameraPosition.zoom
+				map.animateCamera(CameraUpdateFactory.newLatLngZoom(endLatLng, currentZoom))
+			}
         }
     }
     
