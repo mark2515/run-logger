@@ -155,18 +155,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     
     private fun checkPermissionsAndStartTracking() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        val permissions = mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+        
+        val permissionsToRequest = permissions.filter {
+            ActivityCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        
+        if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ),
+                permissionsToRequest.toTypedArray(),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
@@ -234,6 +236,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             
             service.caloriesLiveData.observe(this) { calories ->
                 tvCalories.text = String.format("Calories: %.0f", calories)
+            }
+            
+            service.activityTypeLiveData.observe(this) { activityType ->
+                val activityName = UnitConverter.getActivityTypeName(activityType)
+                tvActivityType.text = "Type: $activityName"
             }
         }
     }

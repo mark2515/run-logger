@@ -2,8 +2,10 @@ package moe.kunlonghe.myruns
 
 import android.Manifest
 import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Binder
@@ -23,6 +25,9 @@ class TrackingService : Service() {
     private val binder = LocalBinder()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private lateinit var notificationManager: NotificationManager
+    private var stopServiceReceiver: BroadcastReceiver? = null
+    
     private val _locationListLiveData = MutableLiveData<ArrayList<LatLng>>()
     val locationListLiveData: LiveData<ArrayList<LatLng>> = _locationListLiveData
     
@@ -44,6 +49,9 @@ class TrackingService : Service() {
     private val _durationLiveData = MutableLiveData<Long>()
     val durationLiveData: LiveData<Long> = _durationLiveData
     
+    private val _activityTypeLiveData = MutableLiveData<Int>()
+    val activityTypeLiveData: LiveData<Int> = _activityTypeLiveData
+    
     // Tracking data
     private var locationList = ArrayList<LatLng>()
     private var totalDistance = 0.0
@@ -58,6 +66,7 @@ class TrackingService : Service() {
         private const val CHANNEL_ID = "tracking_channel"
         private const val LOCATION_UPDATE_INTERVAL = 5000L // 5 seconds
         private const val LOCATION_UPDATE_FASTEST_INTERVAL = 2000L // 2 seconds
+        const val ACTION_STOP_SERVICE = "moe.kunlonghe.myruns.STOP_SERVICE"
     }
 
     inner class LocalBinder : Binder() {
@@ -71,7 +80,24 @@ class TrackingService : Service() {
     override fun onCreate() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
+        
+        // Register broadcast receiver to stop service
+        stopServiceReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == ACTION_STOP_SERVICE) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
+                }
+            }
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(stopServiceReceiver, IntentFilter(ACTION_STOP_SERVICE), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(stopServiceReceiver, IntentFilter(ACTION_STOP_SERVICE))
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -81,6 +107,7 @@ class TrackingService : Service() {
         activityType = intent?.getIntExtra("ACTIVITY_TYPE", MyRunsEntry.ACTIVITY_TYPE_RUNNING) 
             ?: MyRunsEntry.ACTIVITY_TYPE_RUNNING
         
+        _activityTypeLiveData.postValue(activityType)
         startTime = System.currentTimeMillis()
         
         // Start foreground service with notification
@@ -100,30 +127,65 @@ class TrackingService : Service() {
                 "Tracking Service",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "GPS Tracking Service"
+                description = "MyRuns is recording your path"
             }
             
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
     private fun createNotification(): Notification {
-        val notificationIntent = Intent(this, MainActivity::class.java)
+        // Intent to open MapActivity when notification is clicked
+        val notificationIntent = Intent(this, MapActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
         val pendingIntent = PendingIntent.getActivity(
             this, 
             0, 
             notificationIntent, 
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
+        val activityName = UnitConverter.getActivityTypeName(activityType)
+        
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("MyRuns Tracking")
-            .setContentText("Tracking your activity...")
+            .setContentTitle("MyRuns")
+            .setContentText("MyRuns is recording your path")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
+    }
+    
+    private fun updateNotification(distance: Double) {
+        val activityName = UnitConverter.getActivityTypeName(activityType)
+        val distanceStr = if (distance < 0.01) {
+            "0.00 mi"
+        } else {
+            String.format("%.2f mi", distance)
+        }
+        
+        val notificationIntent = Intent(this, MapActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this, 
+            0, 
+            notificationIntent, 
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("MyRuns - $activityName")
+            .setContentText("Distance: $distanceStr")
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+            
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     private fun startLocationUpdates() {
@@ -178,6 +240,9 @@ class TrackingService : Service() {
             val distanceInMiles = distanceInMeters / 1609.34
             totalDistance += distanceInMiles
             _distanceLiveData.postValue(totalDistance)
+            
+            // Update notification with distance
+            updateNotification(totalDistance)
             
             // Calculate climb
             if (location.hasAltitude() && prevLocation.hasAltitude()) {
@@ -247,5 +312,13 @@ class TrackingService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        
+        stopServiceReceiver?.let {
+            try {
+                unregisterReceiver(it)
+            } catch (e: IllegalArgumentException) {
+                // Already unregistered
+            }
+        }
     }
 }
