@@ -321,16 +321,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            map.isMyLocationEnabled = true
-        }
+        // Do not enable My Location layer to avoid showing blue dot and accuracy circle
         
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
-        map.uiSettings.isZoomControlsEnabled = true
+        map.uiSettings.isZoomControlsEnabled = false
     }
     
     private fun updateMap(locations: ArrayList<LatLng>) {
