@@ -276,6 +276,10 @@ class TrackingService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        
+        // Stop location updates
         fusedLocationClient.removeLocationUpdates(locationCallback)
         
         stopServiceReceiver?.let {

@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
@@ -133,6 +134,24 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         
         // Setup button listeners
         setupButtons()
+        
+        // Handle system back button press
+        setupBackPressHandler()
+    }
+    
+    private fun setupBackPressHandler() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (serviceBound) {
+                    unbindService(serviceConnection)
+                    serviceBound = false
+                }
+                if (!isHistoryMode) {
+                    stopService(Intent(this@MapActivity, TrackingService::class.java))
+                }
+                finish()
+            }
+        })
     }
     
     private fun initializeViews() {
