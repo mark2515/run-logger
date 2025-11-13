@@ -146,8 +146,6 @@ class TrackingService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         
-        val activityName = UnitConverter.getActivityTypeName(activityType)
-        
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("MyRuns")
             .setContentText("MyRuns is recording your path")
@@ -156,36 +154,6 @@ class TrackingService : Service() {
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()
-    }
-    
-    private fun updateNotification(distance: Double) {
-        val activityName = UnitConverter.getActivityTypeName(activityType)
-        val distanceStr = if (distance < 0.01) {
-            "0.00 mi"
-        } else {
-            String.format("%.2f mi", distance)
-        }
-        
-        val notificationIntent = Intent(this, MapActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 
-            0, 
-            notificationIntent, 
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("MyRuns - $activityName")
-            .setContentText("Distance: $distanceStr")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentIntent(pendingIntent)
-            .setOngoing(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-            
-        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     private fun startLocationUpdates() {
@@ -240,9 +208,6 @@ class TrackingService : Service() {
             val distanceInMiles = distanceInMeters / 1609.34
             totalDistance += distanceInMiles
             _distanceLiveData.postValue(totalDistance)
-            
-            // Update notification with distance
-            updateNotification(totalDistance)
             
             // Calculate climb
             if (location.hasAltitude() && prevLocation.hasAltitude()) {
