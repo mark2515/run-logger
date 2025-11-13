@@ -15,6 +15,8 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -100,6 +102,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         
         // Initialize views
         initializeViews()
+        
+        applyWindowInsets()
+        
         if (UnitConverter.isMetric(this)) {
             tvClimb.text = String.format("Climb: %.2f Kilometers", 0.0)
         } else {
@@ -166,6 +171,47 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         tvClimb = findViewById(R.id.tv_climb)
         tvCalories = findViewById(R.id.tv_calories)
         tvDistance = findViewById(R.id.tv_distance)
+    }
+    
+    private fun applyWindowInsets() {
+        val statusContainer = findViewById<View>(R.id.status_container)
+        val buttonContainer = findViewById<View>(R.id.button_container)
+        
+        val statusOriginalPadding = intArrayOf(
+            statusContainer.paddingLeft,
+            statusContainer.paddingTop,
+            statusContainer.paddingRight,
+            statusContainer.paddingBottom
+        )
+        
+        val buttonOriginalPadding = intArrayOf(
+            buttonContainer.paddingLeft,
+            buttonContainer.paddingTop,
+            buttonContainer.paddingRight,
+            buttonContainer.paddingBottom
+        )
+        
+        ViewCompat.setOnApplyWindowInsetsListener(statusContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                statusOriginalPadding[0] + insets.left,
+                statusOriginalPadding[1] + insets.top,
+                statusOriginalPadding[2] + insets.right,
+                statusOriginalPadding[3]
+            )
+            windowInsets
+        }
+        
+        ViewCompat.setOnApplyWindowInsetsListener(buttonContainer) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(
+                buttonOriginalPadding[0] + insets.left,
+                buttonOriginalPadding[1],
+                buttonOriginalPadding[2] + insets.right,
+                buttonOriginalPadding[3] + insets.bottom
+            )
+            windowInsets
+        }
     }
     
     private fun setupDatabase() {
