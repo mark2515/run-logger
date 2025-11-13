@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.Button
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import moe.kunlonghe.myruns.database.*
@@ -26,6 +27,9 @@ class FragmentHistory : Fragment() {
         
         // Initialize ListView
         listView = view.findViewById(R.id.listview_history)
+        view.findViewById<Button>(R.id.button_delete_all).setOnClickListener {
+            myRunsViewModel.deleteAll()
+        }
         
         // Initialize adapter with empty list
         adapter = MyRunsEntryAdapter(requireContext(), emptyList())

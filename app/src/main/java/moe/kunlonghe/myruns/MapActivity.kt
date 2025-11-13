@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.widget.Button
 import android.view.View
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -375,5 +377,39 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         finish()
         return true
+    }
+    
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        return if (isHistoryMode) {
+            menuInflater.inflate(R.menu.menu_display_entry, menu)
+            true
+        } else {
+            super.onCreateOptionsMenu(menu)
+        }
+    }
+    
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                if (serviceBound) {
+                    unbindService(serviceConnection)
+                    serviceBound = false
+                }
+                if (!isHistoryMode) {
+                    stopService(Intent(this, TrackingService::class.java))
+                }
+                finish()
+                true
+            }
+            R.id.action_delete -> {
+                if (isHistoryMode && entryId != -1L) {
+                    myRunsViewModel.delete(entryId)
+                    Toast.makeText(this, "Entry deleted", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

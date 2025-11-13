@@ -2,13 +2,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" 
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
     <ListView
         android:id="@+id/listview_history"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp" />
+
+    <Button
+        android:id="@+id/button_delete_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DELETE ALL RECORDS"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="32dp" />
 
 </LinearLayout>
