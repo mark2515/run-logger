@@ -25,7 +25,7 @@ class MyRunsEntryAdapter(
         entry?.let {
             val activityName = UnitConverter.getActivityTypeName(it.activityType)
             val dateTime = UnitConverter.formatDateTime(it.dateTime)
-            titleTextView.text = "Manual Entry: $activityName, $dateTime"
+			titleTextView.text = "${UnitConverter.getInputTypeName(it.inputType)}: $activityName, $dateTime"
 
             val distanceValue = if (it.distance > 0) it.distance else 0.0
             val distance = UnitConverter.formatDistance(context, distanceValue)

@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.Button
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -243,8 +244,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             updateMap(locations)
         }
         
-        buttonSave.isEnabled = false
-        buttonCancel.text = "CLOSE"
+        buttonSave.visibility = View.GONE
+        buttonCancel.visibility = View.GONE
     }
     
     private fun deserializeLocationList(data: ByteArray): ArrayList<LatLng> {
