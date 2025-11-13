@@ -36,6 +36,21 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var tvClimb: TextView
     private lateinit var tvCalories: TextView
     private lateinit var tvDistance: TextView
+    private var lastClimbMeters: Double? = null
+    private lateinit var sharedPrefs: SharedPreferences
+    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == MyDialog.UNIT_PREFERENCE_KEY) {
+            lastClimbMeters?.let { meters ->
+                updateClimbText(meters)
+            } ?: run {
+                if (UnitConverter.isMetric(this)) {
+                    tvClimb.text = String.format("Climb: %.2f Kilometers", 0.0)
+                } else {
+                    tvClimb.text = String.format("Climb: %.2f Miles", 0.0)
+                }
+            }
+        }
+    }
     
     private var googleMap: GoogleMap? = null
     private var inputTypeInt: Int = MyRunsEntry.INPUT_TYPE_GPS
@@ -76,9 +91,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = "Map"
+        sharedPrefs = getSharedPreferences(MyDialog.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
         
         // Initialize views
         initializeViews()
+        if (UnitConverter.isMetric(this)) {
+            tvClimb.text = String.format("Climb: %.2f Kilometers", 0.0)
+        } else {
+            tvClimb.text = String.format("Climb: %.2f Miles", 0.0)
+        }
         
         // Setup database
         setupDatabase()
@@ -206,18 +227,23 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             
             service.climbLiveData.observe(this) { climbMeters ->
-                if (UnitConverter.isMetric(this)) {
-                    val climbKm = climbMeters / 1000.0
-                    tvClimb.text = String.format("Climb: %.2f Kilometers", climbKm)
-                } else {
-					val climbMiles = climbMeters / 1609.34
-					tvClimb.text = String.format("Climb: %.2f Miles", climbMiles)
-                }
+                lastClimbMeters = climbMeters
+                updateClimbText(climbMeters)
             }
             
             service.caloriesLiveData.observe(this) { calories ->
                 tvCalories.text = String.format("Calories: %.0f", calories)
             }
+        }
+    }
+    
+    private fun updateClimbText(climbMeters: Double) {
+        if (UnitConverter.isMetric(this)) {
+            val climbKm = climbMeters / 1000.0
+            tvClimb.text = String.format("Climb: %.2f Kilometers", climbKm)
+        } else {
+            val climbMiles = climbMeters / 1609.34
+            tvClimb.text = String.format("Climb: %.2f Miles", climbMiles)
         }
     }
     
@@ -386,6 +412,20 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             unbindService(serviceConnection)
             serviceBound = false
         }
+    }
+    
+    override fun onStart() {
+        super.onStart()
+        if (::sharedPrefs.isInitialized) {
+            sharedPrefs.registerOnSharedPreferenceChangeListener(prefsListener)
+        }
+    }
+    
+    override fun onStop() {
+        if (::sharedPrefs.isInitialized) {
+            sharedPrefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
+        }
+        super.onStop()
     }
     
     override fun onSupportNavigateUp(): Boolean {

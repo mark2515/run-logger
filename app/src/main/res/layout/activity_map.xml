@@ -87,7 +87,7 @@
             android:id="@+id/tv_distance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Distance: 0.00 miles"
+            android:text="Distance: 0.00 Miles"
             android:textColor="@android:color/black"
             android:textSize="14sp"
             android:layout_marginTop="2dp"
