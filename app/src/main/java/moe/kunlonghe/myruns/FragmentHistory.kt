@@ -35,9 +35,17 @@ class FragmentHistory : Fragment() {
         listView.setOnItemClickListener { _, _, position, _ ->
             val entry = adapter.getItem(position)
             entry?.let {
-                val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
-                intent.putExtra("ENTRY_ID", it.id)
-                startActivity(intent)
+                if ((it.inputType == MyRunsEntry.INPUT_TYPE_GPS || 
+                     it.inputType == MyRunsEntry.INPUT_TYPE_AUTOMATIC) && 
+                    it.locationList != null) {
+                    val intent = Intent(requireContext(), MapActivity::class.java)
+                    intent.putExtra("ENTRY_ID", it.id)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(requireContext(), DisplayEntryActivity::class.java)
+                    intent.putExtra("ENTRY_ID", it.id)
+                    startActivity(intent)
+                }
             }
         }
         

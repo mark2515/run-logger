@@ -12,6 +12,7 @@ import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
+import com.google.android.gms.maps.model.LatLng
 import java.io.IOException
 
 object Util {
@@ -36,6 +37,14 @@ object Util {
             if (ContextCompat.checkSelfPermission(a, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 needed.add(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
+        }
+
+        // Location permissions
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            needed.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            needed.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
 
         if (needed.isNotEmpty()) {
@@ -92,5 +101,48 @@ object Util {
         } catch (e: IOException) {
             0f
         }
+    }
+    
+    // Location utilities
+    fun serializeLocationList(locations: ArrayList<LatLng>): ByteArray? {
+        if (locations.isEmpty()) return null
+        
+        return try {
+            val stringBuilder = StringBuilder()
+            for (latLng in locations) {
+                stringBuilder.append("${latLng.latitude},${latLng.longitude};")
+            }
+            stringBuilder.toString().toByteArray()
+        } catch (e: Exception) {
+            null
+        }
+    }
+    
+    fun deserializeLocationList(data: ByteArray): ArrayList<LatLng> {
+        val locations = ArrayList<LatLng>()
+        try {
+            val dataStr = String(data)
+            val points = dataStr.split(";")
+            for (point in points) {
+                if (point.isNotEmpty()) {
+                    val coords = point.split(",")
+                    if (coords.size == 2) {
+                        val lat = coords[0].toDouble()
+                        val lng = coords[1].toDouble()
+                        locations.add(LatLng(lat, lng))
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return locations
+    }
+    
+    fun hasLocationPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context, 
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

@@ -1,20 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <View
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        tools:context=".MapActivity" />
+
+    <LinearLayout
+        android:id="@+id/status_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tv_activity_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Type: Running"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+        <TextView
+            android:id="@+id/tv_avg_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avg speed: 0.00 mph"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+        <TextView
+            android:id="@+id/tv_current_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cur speed: 0.00 mph"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+        <TextView
+            android:id="@+id/tv_climb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Climb: 0.00 m"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+        <TextView
+            android:id="@+id/tv_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Calories: 0"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+        <TextView
+            android:id="@+id/tv_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distance: 0.00 miles"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:layout_marginTop="2dp"
+            android:shadowColor="#FFFFFF"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center">
+        android:padding="16dp">
 
         <Button
             android:id="@+id/button_save"
@@ -34,4 +123,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>
