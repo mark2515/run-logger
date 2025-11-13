@@ -65,7 +65,10 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var startMarker: Marker? = null
     private var endMarker: Marker? = null
     private var polyline: Polyline? = null
-		private var hasCenteredCamera: Boolean = false
+	private var hasCenteredCamera: Boolean = false
+    private val markerList = mutableListOf<Marker>()
+    private val markerPositions = mutableListOf<LatLng>()
+    private var interactivePolyline: Polyline? = null
     
     private lateinit var myRunsViewModel: MyRunsViewModel
     
@@ -349,6 +352,52 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap = map        
         map.mapType = GoogleMap.MAP_TYPE_NORMAL
         map.uiSettings.isZoomControlsEnabled = false
+        
+        if (!isHistoryMode) {
+            // Set up long click listener to add markers and connect with lines
+            map.setOnMapLongClickListener { latLng ->
+                onMapLongClick(latLng)
+            }
+            
+            // Set up click listener to clear all markers and lines
+            map.setOnMapClickListener { latLng ->
+                onMapClick(latLng)
+            }
+        }
+    }
+    
+    private fun onMapLongClick(latLng: LatLng) {
+        // Add marker at the long-pressed position
+        val marker = googleMap?.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title("Marker ${markerList.size + 1}")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+        )
+        
+        marker?.let {
+            markerList.add(it)
+            markerPositions.add(latLng)
+        }
+        
+        if (markerPositions.size >= 2) {
+            // Remove old polyline if exists
+            interactivePolyline?.remove()
+            
+            // Create new polyline connecting all markers
+            val polylineOptions = PolylineOptions()
+                .addAll(markerPositions)
+                .color(Color.RED)
+                .width(8f)
+            
+            interactivePolyline = googleMap?.addPolyline(polylineOptions)
+        }
+    }
+    
+    private fun onMapClick(latLng: LatLng) {
+        // Remove only the polyline, keep the markers
+        interactivePolyline?.remove()
+        interactivePolyline = null
     }
     
     private fun updateMap(locations: ArrayList<LatLng>) {
