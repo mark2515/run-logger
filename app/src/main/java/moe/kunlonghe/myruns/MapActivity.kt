@@ -210,7 +210,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     val climbKm = climbMeters / 1000.0
                     tvClimb.text = String.format("Climb: %.2f Kilometers", climbKm)
                 } else {
-                    tvClimb.text = String.format("Climb: %.2f m", climbMeters)
+					val climbMiles = climbMeters / 1609.34
+					tvClimb.text = String.format("Climb: %.2f Miles", climbMiles)
                 }
             }
             
