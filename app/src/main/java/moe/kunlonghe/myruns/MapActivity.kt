@@ -371,7 +371,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         val marker = googleMap?.addMarker(
             MarkerOptions()
                 .position(latLng)
-                .title("Marker ${markerList.size + 1}")
+                .title("Marker")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
         )
         
@@ -395,9 +395,22 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
     
     private fun onMapClick(latLng: LatLng) {
-        // Remove only the polyline, keep the markers
-        interactivePolyline?.remove()
-        interactivePolyline = null
+        // Toggle polyline visibility
+        if (interactivePolyline != null) {
+            // Polyline exists, remove it
+            interactivePolyline?.remove()
+            interactivePolyline = null
+        } else {
+            // Polyline doesn't exist, restore it if we have at least 2 markers
+            if (markerPositions.size >= 2) {
+                val polylineOptions = PolylineOptions()
+                    .addAll(markerPositions)
+                    .color(Color.RED)
+                    .width(8f)
+                
+                interactivePolyline = googleMap?.addPolyline(polylineOptions)
+            }
+        }
     }
     
     private fun updateMap(locations: ArrayList<LatLng>) {
@@ -468,7 +481,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         trackingService?.let { service ->
             val entry = service.getMyRunsEntry()
             myRunsViewModel.insert(entry)
-            Toast.makeText(this, "Workout saved!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Map saved!", Toast.LENGTH_SHORT).show()
         }
         
         if (serviceBound) {
