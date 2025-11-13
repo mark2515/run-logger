@@ -183,20 +183,35 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                 updateMap(locations)
             }
             
-            service.distanceLiveData.observe(this) { distance ->
-                tvDistance.text = String.format("Distance: %.2f miles", distance)
+            service.distanceLiveData.observe(this) { distanceMiles ->
+                tvDistance.text = "Distance: ${UnitConverter.formatDistance(this, distanceMiles)}"
             }
             
-            service.avgSpeedLiveData.observe(this) { avgSpeed ->
-                tvAvgSpeed.text = String.format("Avg speed: %.2f mph", avgSpeed)
+            service.avgSpeedLiveData.observe(this) { avgSpeedMph ->
+                if (UnitConverter.isMetric(this)) {
+                    val avgKmh = UnitConverter.milesToKm(avgSpeedMph)
+                    tvAvgSpeed.text = String.format("Avg speed: %.2f km/h", avgKmh)
+                } else {
+                    tvAvgSpeed.text = String.format("Avg speed: %.2f mph", avgSpeedMph)
+                }
             }
             
-            service.currentSpeedLiveData.observe(this) { currentSpeed ->
-                tvCurrentSpeed.text = String.format("Cur speed: %.2f mph", currentSpeed)
+            service.currentSpeedLiveData.observe(this) { currentSpeedMph ->
+                if (UnitConverter.isMetric(this)) {
+                    val curKmh = UnitConverter.milesToKm(currentSpeedMph)
+                    tvCurrentSpeed.text = String.format("Cur speed: %.2f km/h", curKmh)
+                } else {
+                    tvCurrentSpeed.text = String.format("Cur speed: %.2f mph", currentSpeedMph)
+                }
             }
             
-            service.climbLiveData.observe(this) { climb ->
-                tvClimb.text = String.format("Climb: %.2f m", climb)
+            service.climbLiveData.observe(this) { climbMeters ->
+                if (UnitConverter.isMetric(this)) {
+                    val climbKm = climbMeters / 1000.0
+                    tvClimb.text = String.format("Climb: %.2f Kilometers", climbKm)
+                } else {
+                    tvClimb.text = String.format("Climb: %.2f m", climbMeters)
+                }
             }
             
             service.caloriesLiveData.observe(this) { calories ->
@@ -228,7 +243,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     
     private fun displayHistoryEntry(entry: MyRunsEntry) {
         tvActivityType.text = "Type: ${UnitConverter.getActivityTypeName(entry.activityType)}"
-        tvDistance.text = String.format("Distance: %.2f miles", entry.distance)
+        tvDistance.text = "Distance: ${UnitConverter.formatDistance(this, entry.distance)}"
         tvCalories.text = String.format("Calories: %.0f", entry.calorie)
         
         val avgSpeed = if (entry.duration > 0) {
@@ -236,7 +251,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             0.0
         }
-        tvAvgSpeed.text = String.format("Avg speed: %.2f mph", avgSpeed)
+        if (UnitConverter.isMetric(this)) {
+            val avgKmh = UnitConverter.milesToKm(avgSpeed)
+            tvAvgSpeed.text = String.format("Avg speed: %.2f km/h", avgKmh)
+        } else {
+            tvAvgSpeed.text = String.format("Avg speed: %.2f mph", avgSpeed)
+        }
         tvCurrentSpeed.text = "Cur speed: N/A"
         tvClimb.text = "Climb: N/A"
         
