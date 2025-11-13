@@ -30,6 +30,9 @@ data class MyRunsEntry(
     @ColumnInfo(name = "heart_rate")
     var heartRate: Double = 0.0,
 
+    @ColumnInfo(name = "climb")
+    var climb: Double = 0.0,
+
     @ColumnInfo(name = "comment")
     var comment: String = "",
 

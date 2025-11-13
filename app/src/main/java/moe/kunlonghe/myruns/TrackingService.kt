@@ -255,6 +255,7 @@ class TrackingService : Service() {
             distance = totalDistance,
             calorie = totalDistance * 100,
             heartRate = 0.0,
+            climb = totalClimb,
             comment = "",
             locationList = serializeLocationList(locationList)
         )

@@ -361,7 +361,14 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             tvAvgSpeed.text = String.format("Avg speed: %.2f mph", avgSpeed)
         }
         tvCurrentSpeed.text = "Cur speed: N/A"
-        tvClimb.text = "Climb: N/A"
+        
+        if (UnitConverter.isMetric(this)) {
+            val climbKm = entry.climb / 1000.0
+            tvClimb.text = String.format("Climb: %.2f Kilometers", climbKm)
+        } else {
+            val climbMiles = entry.climb / 1609.34
+            tvClimb.text = String.format("Climb: %.2f Miles", climbMiles)
+        }
         
         // Deserialize and display locations
         entry.locationList?.let { locationData ->
