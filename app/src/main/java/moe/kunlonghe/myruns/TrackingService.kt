@@ -7,11 +7,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
+import android.os.AsyncTask
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LiveData
@@ -19,14 +25,24 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import moe.kunlonghe.myruns.database.MyRunsEntry
+import java.util.concurrent.ArrayBlockingQueue
+import kotlin.math.sqrt
 
-class TrackingService : Service() {
+class TrackingService : Service(), SensorEventListener {
 
     private val binder = LocalBinder()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var notificationManager: NotificationManager
     private var stopServiceReceiver: BroadcastReceiver? = null
+    
+    // Activity recognition components
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var accBuffer: ArrayBlockingQueue<Double>? = null
+    private var classificationTask: OnSensorChangedTask? = null
+    private val activityCounts = mutableMapOf<Int, Int>()
+    private val fft = FFT(Globals.ACCELEROMETER_BLOCK_CAPACITY)
     
     private val _locationListLiveData = MutableLiveData<ArrayList<LatLng>>()
     val locationListLiveData: LiveData<ArrayList<LatLng>> = _locationListLiveData
@@ -83,6 +99,10 @@ class TrackingService : Service() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel()
         
+        // Initialize sensor manager for activity recognition
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        
         // Register broadcast receiver to stop service
         stopServiceReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -116,6 +136,11 @@ class TrackingService : Service() {
         
         // Start location updates
         startLocationUpdates()
+        
+        // Start activity recognition if in Automatic mode
+        if (inputType == MyRunsEntry.INPUT_TYPE_AUTOMATIC) {
+            startActivityRecognition()
+        }
         
         return START_STICKY
     }
@@ -275,10 +300,156 @@ class TrackingService : Service() {
         }
     }
 
+    private fun startActivityRecognition() {
+        accBuffer = ArrayBlockingQueue(Globals.ACCELEROMETER_BUFFER_CAPACITY)
+        
+        // Register accelerometer sensor listener
+        accelerometer?.let {
+            sensorManager.registerListener(
+                this,
+                it,
+                SensorManager.SENSOR_DELAY_FASTEST
+            )
+        }
+        
+        // Start the classification task
+        classificationTask = OnSensorChangedTask()
+        classificationTask?.execute()
+    }
+    
+    private fun stopActivityRecognition() {
+        // Unregister sensor listener
+        sensorManager.unregisterListener(this)
+        
+        // Cancel the classification task
+        classificationTask?.cancel(true)
+        classificationTask = null
+        
+        accBuffer?.clear()
+        accBuffer = null
+    }
+    
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_LINEAR_ACCELERATION) {
+            // Calculate magnitude from x, y, z values
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+            val magnitude = sqrt((x * x + y * y + z * z).toDouble())
+            
+            // Add to buffer
+            try {
+                accBuffer?.add(magnitude)
+            } catch (e: IllegalStateException) {
+                // Buffer is full, double the capacity
+                val newBuffer = ArrayBlockingQueue<Double>(accBuffer!!.size * 2)
+                accBuffer!!.drainTo(newBuffer)
+                accBuffer = newBuffer
+                accBuffer?.add(magnitude)
+            }
+        }
+    }
+    
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+    
+    private inner class OnSensorChangedTask : AsyncTask<Void, Void, Void>() {
+        
+        override fun doInBackground(vararg params: Void?): Void? {
+            var blockSize = 0
+            val accBlock = DoubleArray(Globals.ACCELEROMETER_BLOCK_CAPACITY)
+            val im = DoubleArray(Globals.ACCELEROMETER_BLOCK_CAPACITY)
+            
+            while (!isCancelled) {
+                try {
+                    // Get magnitude from buffer
+                    val magnitude = accBuffer?.take() ?: continue
+                    accBlock[blockSize++] = magnitude
+                    
+                    if (blockSize == Globals.ACCELEROMETER_BLOCK_CAPACITY) {
+                        blockSize = 0
+                        
+                        // Find max magnitude
+                        var max = accBlock[0]
+                        for (value in accBlock) {
+                            if (value > max) {
+                                max = value
+                            }
+                        }
+                        
+                        // Perform FFT
+                        fft.fft(accBlock, im)
+                        
+                        // Create feature array for classification
+                        val features = Array<Any>(Globals.ACCELEROMETER_BLOCK_CAPACITY + 1) { 0.0 }
+                        
+                        for (i in accBlock.indices) {
+                            val mag = sqrt(accBlock[i] * accBlock[i] + im[i] * im[i])
+                            features[i] = mag
+                            im[i] = 0.0 // Clear for next iteration
+                        }
+                        
+                        // Add max as the last feature
+                        features[Globals.ACCELEROMETER_BLOCK_CAPACITY] = max
+                        
+                        // Classify using Weka classifier
+                        try {
+                            val activityLabel = WekaClassifier.classify(features).toInt()
+                            
+                            // Map Weka classification to MyRunsEntry activity types
+                            val recognizedActivity = when (activityLabel) {
+                                Globals.ACTIVITY_ID_STANDING -> MyRunsEntry.ACTIVITY_TYPE_STANDING
+                                Globals.ACTIVITY_ID_WALKING -> MyRunsEntry.ACTIVITY_TYPE_WALKING
+                                Globals.ACTIVITY_ID_RUNNING -> MyRunsEntry.ACTIVITY_TYPE_RUNNING
+                                else -> MyRunsEntry.ACTIVITY_TYPE_OTHER
+                            }
+                            
+                            // Count activity occurrences
+                            activityCounts[recognizedActivity] = 
+                                (activityCounts[recognizedActivity] ?: 0) + 1
+                            
+                            // Update activity type to the most common one
+                            val mostCommonActivity = activityCounts.maxByOrNull { it.value }?.key
+                            if (mostCommonActivity != null && mostCommonActivity != activityType) {
+                                activityType = mostCommonActivity
+                                _activityTypeLiveData.postValue(activityType)
+                                Log.d(Globals.TAG, "Activity detected: ${getActivityName(activityType)}")
+                            }
+                            
+                        } catch (e: Exception) {
+                            Log.e(Globals.TAG, "Classification error: ${e.message}")
+                        }
+                    }
+                    
+                } catch (e: InterruptedException) {
+                    break
+                } catch (e: Exception) {
+                    Log.e(Globals.TAG, "Error in classification task: ${e.message}")
+                }
+            }
+            
+            return null
+        }
+        
+        private fun getActivityName(activityType: Int): String {
+            return when (activityType) {
+                MyRunsEntry.ACTIVITY_TYPE_STANDING -> "Standing"
+                MyRunsEntry.ACTIVITY_TYPE_WALKING -> "Walking"
+                MyRunsEntry.ACTIVITY_TYPE_RUNNING -> "Running"
+                else -> "Other"
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         
         stopForeground(STOP_FOREGROUND_REMOVE)
+        
+        // Stop activity recognition if it was started
+        if (inputType == MyRunsEntry.INPUT_TYPE_AUTOMATIC) {
+            stopActivityRecognition()
+        }
         
         // Stop location updates
         fusedLocationClient.removeLocationUpdates(locationCallback)
