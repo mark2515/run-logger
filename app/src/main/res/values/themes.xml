@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Kunlong_He_MyRuns4" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.Kunlong_He_MyRuns5" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/gray_500</item>
         <item name="colorPrimaryDark">@color/gray_700</item>
         <item name="colorAccent">@color/teal_200</item>
