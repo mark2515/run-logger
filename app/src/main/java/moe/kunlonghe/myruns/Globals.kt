@@ -13,7 +13,9 @@ object Globals {
     const val ACTIVITY_ID_RUNNING = 2
     const val ACTIVITY_ID_OTHER = 3
 
-    const val RECENT_ACTIVITY_WINDOW_SIZE = 50
+    const val RECENT_ACTIVITY_WINDOW_SIZE = 20
+
+    const val STANDING_STREAK_THRESHOLD = 5
 
     const val SERVICE_TASK_TYPE_COLLECT = 0
     const val SERVICE_TASK_TYPE_CLASSIFY = 1

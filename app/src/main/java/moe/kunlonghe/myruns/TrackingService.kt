@@ -423,8 +423,27 @@ class TrackingService : Service(), SensorEventListener {
                                 }
                             }
 
-                            if (mostCommonActivity != null && mostCommonActivity != activityType) {
-                                activityType = mostCommonActivity
+                            val standingStreak = synchronized(recentActivities) {
+                                var streak = 0
+                                for (a in recentActivities.reversed()) {
+                                    if (a == MyRunsEntry.ACTIVITY_TYPE_STANDING) {
+                                        streak++
+                                        if (streak >= Globals.STANDING_STREAK_THRESHOLD) break
+                                    } else {
+                                        break
+                                    }
+                                }
+                                streak
+                            }
+
+                            val newActivity = when {
+                                standingStreak >= Globals.STANDING_STREAK_THRESHOLD ->
+                                    MyRunsEntry.ACTIVITY_TYPE_STANDING
+                                else -> mostCommonActivity
+                            }
+
+                            if (newActivity != null && newActivity != activityType) {
+                                activityType = newActivity
                                 _activityTypeLiveData.postValue(activityType)
                                 Log.d(Globals.TAG, "Activity detected: ${getActivityName(activityType)}")
                             }
