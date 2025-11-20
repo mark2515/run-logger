@@ -41,7 +41,7 @@ class TrackingService : Service(), SensorEventListener {
     private var accelerometer: Sensor? = null
     private var accBuffer: ArrayBlockingQueue<Double>? = null
     private var classificationTask: OnSensorChangedTask? = null
-    private val activityCounts = mutableMapOf<Int, Int>()
+    private val recentActivities = ArrayDeque<Int>()
     private val fft = FFT(Globals.ACCELEROMETER_BLOCK_CAPACITY)
     
     private val _locationListLiveData = MutableLiveData<ArrayList<LatLng>>()
@@ -404,12 +404,25 @@ class TrackingService : Service(), SensorEventListener {
                                 else -> MyRunsEntry.ACTIVITY_TYPE_OTHER
                             }
                             
-                            // Count activity occurrences
-                            activityCounts[recognizedActivity] = 
-                                (activityCounts[recognizedActivity] ?: 0) + 1
-                            
-                            // Update activity type to the most common one
-                            val mostCommonActivity = activityCounts.maxByOrNull { it.value }?.key
+                            synchronized(recentActivities) {
+                                recentActivities.addLast(recognizedActivity)
+                                if (recentActivities.size > Globals.RECENT_ACTIVITY_WINDOW_SIZE) {
+                                    recentActivities.removeFirst()
+                                }
+                            }
+
+                            val mostCommonActivity = synchronized(recentActivities) {
+                                if (recentActivities.isEmpty()) {
+                                    null
+                                } else {
+                                    recentActivities
+                                        .groupingBy { it }
+                                        .eachCount()
+                                        .maxByOrNull { it.value }
+                                        ?.key
+                                }
+                            }
+
                             if (mostCommonActivity != null && mostCommonActivity != activityType) {
                                 activityType = mostCommonActivity
                                 _activityTypeLiveData.postValue(activityType)

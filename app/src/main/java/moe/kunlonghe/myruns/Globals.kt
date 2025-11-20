@@ -11,7 +11,9 @@ object Globals {
     const val ACTIVITY_ID_STANDING = 0
     const val ACTIVITY_ID_WALKING = 1
     const val ACTIVITY_ID_RUNNING = 2
-    const val ACTIVITY_ID_OTHER = 2
+    const val ACTIVITY_ID_OTHER = 3
+
+    const val RECENT_ACTIVITY_WINDOW_SIZE = 50
 
     const val SERVICE_TASK_TYPE_COLLECT = 0
     const val SERVICE_TASK_TYPE_CLASSIFY = 1
