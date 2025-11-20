@@ -125,10 +125,15 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
             // Get data from intent for new tracking
             inputTypeStr = intent.getStringExtra("INPUT_TYPE")
             activityTypeStr = intent.getStringExtra("ACTIVITY_TYPE")
-            
+
             inputTypeInt = UnitConverter.getInputTypeInt(inputTypeStr ?: "GPS")
-            activityTypeInt = UnitConverter.getActivityTypeInt(activityTypeStr ?: "Running")
-            
+            if (inputTypeInt == MyRunsEntry.INPUT_TYPE_AUTOMATIC) {
+                activityTypeInt = MyRunsEntry.ACTIVITY_TYPE_STANDING
+                activityTypeStr = UnitConverter.getActivityTypeName(activityTypeInt)
+            } else {
+                activityTypeInt = UnitConverter.getActivityTypeInt(activityTypeStr ?: "Running")
+            }
+
             tvActivityType.text = "Type: ${activityTypeStr ?: "Running"}"
             
             // Request location permissions and start tracking

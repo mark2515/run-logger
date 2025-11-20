@@ -122,10 +122,14 @@ class TrackingService : Service(), SensorEventListener {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Get input and activity type from intent
-        inputType = intent?.getIntExtra("INPUT_TYPE", MyRunsEntry.INPUT_TYPE_GPS) 
+        inputType = intent?.getIntExtra("INPUT_TYPE", MyRunsEntry.INPUT_TYPE_GPS)
             ?: MyRunsEntry.INPUT_TYPE_GPS
-        activityType = intent?.getIntExtra("ACTIVITY_TYPE", MyRunsEntry.ACTIVITY_TYPE_RUNNING) 
-            ?: MyRunsEntry.ACTIVITY_TYPE_RUNNING
+        activityType = if (inputType == MyRunsEntry.INPUT_TYPE_AUTOMATIC) {
+            MyRunsEntry.ACTIVITY_TYPE_STANDING
+        } else {
+            intent?.getIntExtra("ACTIVITY_TYPE", MyRunsEntry.ACTIVITY_TYPE_RUNNING)
+                ?: MyRunsEntry.ACTIVITY_TYPE_RUNNING
+        }
         
         _activityTypeLiveData.postValue(activityType)
         startTime = System.currentTimeMillis()
